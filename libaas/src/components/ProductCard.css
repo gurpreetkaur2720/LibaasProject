@@ -1,0 +1,111 @@
+.product-card {
+  width: 220px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+  margin: 10px 0;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+
+.image-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.08);
+  filter: brightness(1.1);
+}
+
+/* Common icon circle style */
+.icon-circle {
+  background: white;
+  border-radius: 50%;
+  padding: 6px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: transform 0.2s, color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-circle:hover {
+  transform: scale(1.15);
+  color: #e63946;
+}
+
+/* Wishlist at top-right */
+.wishlist {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.wishlist.active {
+  color: red;
+}
+
+/* Floating icons at bottom-right */
+.action-icons {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 2;
+}
+
+.product-card:hover .action-icons {
+  opacity: 1;
+}
+
+.product-info {
+  padding: 10px;
+  text-align: center;
+}
+
+.product-name {
+  font-size: 15px;
+  font-weight: 600;    /* bolder for visibility */
+  margin: 5px 0;
+  color: #333;
+}
+
+.product-price {
+  font-size: 14px;     /* smaller font size */
+  margin-bottom: 5px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-right: 6px;
+  font-size: 12px;
+}
+
+.new-price {
+  color: #3c2dc4;      /* blue color */
+  font-weight: 600;
+  font-size: 14px;
+}

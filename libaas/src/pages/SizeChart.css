@@ -1,0 +1,45 @@
+.size-chart-page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #5a1a1a;
+}
+
+.size-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.size-table th,
+.size-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.size-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.size-img img {
+  max-width: 300px;
+  margin: 20px auto;
+  display: block;
+}
+
+.size-note {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.5;
+}

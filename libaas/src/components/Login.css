@@ -1,0 +1,142 @@
+/* Reset Body Defaults */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: 100vh;
+  overflow-y: auto; /* ✅ scrolling enabled */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Whole Page */
+.login-container {
+  display: flex;
+  min-height: 100vh; /* ✅ page expands with content */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Left Side Image */
+.login-image {
+  flex: 1;
+  height: 100%;
+}
+
+.login-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Right Side with Blue Gradient */
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0a192f, #0077b6, #00b4d8);
+  margin: 0;
+  padding: 0;
+}
+
+/* Card */
+.login-card {
+  width: 360px;
+  padding: 35px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+}
+
+.login-card h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #0a192f;
+}
+
+/* Inputs + Buttons */
+.login-card input,
+.login-btn,
+.google-btn {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+/* Inputs */
+.login-card input {
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  color: #0a192f;
+}
+
+/* ✅ Login Button (keep same colors) */
+.login-btn {
+  background: #90e0ef;   /* light blue */
+  color: #0a192f;        /* dark text */
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  background: #0096c7;   /* darker blue */
+  color: #ffffff;        /* white text */
+}
+
+/* Google Button */
+.google-btn {
+  border: 1px solid #00b4d8;
+  background: #fff;
+  color: #0077b6;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.google-btn:hover {
+  background: #f0f8ff; /* Light blue hover */
+}
+
+/* Links */
+.signup-text {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #0a192f;
+}
+
+.signup-text a {
+  color: #0077b6;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.back-home {
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.back-home a {
+  color: #0077b6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-home a:hover {
+  text-decoration: underline;
+}
