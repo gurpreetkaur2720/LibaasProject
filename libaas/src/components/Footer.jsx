@@ -19,7 +19,7 @@ export default function Footer() {
         </p>
 
         <nav className="footer__links" aria-label="Footer links">
-          <Link to="/about">About Us</Link>
+          <Link to="/about">About </Link>
           <span className="sep" aria-hidden="true">•</span>
           <Link to="/size-chart">Size Chart</Link>
         </nav>
