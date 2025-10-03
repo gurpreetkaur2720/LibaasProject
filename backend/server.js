@@ -6,8 +6,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+const mongo_link = "mongodb+srv://gurpreet:1234@cluster0.bnpj2bc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
 // Connect to MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/libaasdb", {
+mongoose.connect(mongo_link, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
