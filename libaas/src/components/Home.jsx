@@ -1,3 +1,4 @@
+// libaas/src/components/Home.jsx
 import React from "react";
 import ProductCard from "../components/ProductCard";
 import "../components/ProductCard.css";
@@ -42,11 +43,8 @@ export default function Home() {
 
   return (
     <div className="home-page">
-      {/* Banner */}
-      <div
-        className="home-banner"
-        style={{ backgroundImage: `url(${bannerImg})` }}
-      >
+      {/* ✅ Banner */}
+      <div className="home-banner" style={{ backgroundImage: `url(${bannerImg})` }}>
         <div className="home-banner-content">
           <h1>LIBAAS</h1>
           <p>Welcome to LIBAAS — Discover Our New Fashion Trends</p>
@@ -54,20 +52,15 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Featured Products */}
+      {/* ✅ Featured Products */}
       <h2 className="home-heading">✨ Featured Products ✨</h2>
       <div className="home-product-grid">
         {featuredProducts.map((item, i) => (
-          <ProductCard
-            key={i}
-            image={item.image}
-            name={item.name}
-            price={item.price}
-          />
+          <ProductCard key={i} image={item.image} name={item.name} price={item.price} />
         ))}
       </div>
 
-      {/* Image Gallery */}
+      {/* ✅ Image Gallery */}
       <h2 className="home-heading">Image Gallery</h2>
       <div className="home-image-gallery">
         {galleryImages.map((src, i) => (

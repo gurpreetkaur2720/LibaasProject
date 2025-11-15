@@ -1,0 +1,111 @@
+/* =============== MAIN WRAPPER =============== */
+.wishlist-container {
+  min-height: 80vh;
+  padding: 40px;
+  max-width: 1200px;
+  margin: auto;
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Heading */
+.wishlist-container h2 {
+  margin-bottom: 20px;
+  font-size: 22px;   /* smaller */
+  font-weight: 600;
+  color: #222;
+}
+
+/* =============== EMPTY MESSAGE =============== */
+.wishlist-grid p {
+  font-size: 16px;  /* smaller */
+  font-weight: 500;
+  color: #555;
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: -10px; /* small spacing */
+}
+
+/* =============== GRID LAYOUT =============== */
+.wishlist-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+}
+
+/* =============== CARD =============== */
+.wishlist-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: 0.3s ease;
+  text-align: center;
+}
+
+.wishlist-card:hover {
+  transform: translateY(-5px);
+}
+
+/* =============== PRODUCT IMAGE =============== */
+.wishlist-card img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+/* Product Name */
+.wishlist-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 12px;
+  color: #222;
+}
+
+/* Price */
+.wishlist-card p {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3c2dc4;
+  margin: 8px 0;
+}
+
+/* Buttons */
+.move-btn,
+.remove-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+/* Move to cart button */
+.move-btn {
+  background: #3c2dc4;
+  color: white;
+}
+
+.move-btn:hover {
+  background: #2a1fa0;
+}
+
+/* Remove button */
+.remove-btn {
+  background: #eee;
+  color: #333;
+}
+
+.remove-btn:hover {
+  background: #ffdddd;
+  color: #d00000;
+}

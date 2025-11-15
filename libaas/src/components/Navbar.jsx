@@ -1,9 +1,18 @@
 // src/components/Navbar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user")); // check login state
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
     <nav className="navbar">
       {/* Left Logo */}
@@ -25,8 +34,23 @@ const Navbar = () => {
       <div className="navbar-icons">
         <Link to="/wishlist" className="icon">♡</Link>
         <Link to="/cart" className="icon">🛒</Link>
-        <Link to="/login" className="btn login-btn">Login</Link>
-        <Link to="/signup" className="btn signup-btn">Signup</Link>
+
+        {/* Conditional rendering */}
+        {user ? (
+          <div className="user-info">
+            <span className="username">
+              Hi, <b>{user.name}</b>
+            </span>
+            <button className="btn logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <>
+            <Link to="/login" className="btn login-btn">Login</Link>
+            <Link to="/signup" className="btn signup-btn">Signup</Link>
+          </>
+        )}
       </div>
     </nav>
   );
