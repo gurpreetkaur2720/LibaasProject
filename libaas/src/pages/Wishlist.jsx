@@ -7,17 +7,16 @@ export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
   const token = localStorage.getItem("token");
 
-  // LOAD WISHLIST
+  // -------- Load Wishlist --------
   useEffect(() => {
     if (!token) return;
 
     const loadWishlist = async () => {
       try {
-        const res = await api.get("/api/user/wishlist", {
-          headers: { "x-auth-token": token }
+        const response = await api.get("/api/user/wishlist", {
+          headers: { "x-auth-token": token },
         });
-
-        setWishlist(res.data.wishlist);
+        setWishlist(response.data.wishlist);
       } catch (err) {
         console.error("Wishlist Load Error:", err);
       }
@@ -26,31 +25,30 @@ export default function Wishlist() {
     loadWishlist();
   }, [token]);
 
-  // REMOVE ITEM
+  // -------- Remove Item --------
   const removeItem = async (productId) => {
     try {
       await api.delete(`/api/user/wishlist/remove/${productId}`, {
-        headers: { "x-auth-token": token }
+        headers: { "x-auth-token": token },
       });
-
-      setWishlist((prev) => prev.filter((item) => item._id !== productId));
+      setWishlist((prev) =>
+        prev.filter((item) => item.product._id !== productId)
+      );
     } catch (err) {
       console.error("Remove Failed:", err);
     }
   };
 
-  // MOVE TO CART
+  // -------- Move to Cart --------
   const moveToCart = async (item) => {
     try {
-      // Add item to cart
       await api.post(
         "/api/user/cart/add",
-        { productId: item._id },
+        { productId: item.product._id },
         { headers: { "x-auth-token": token } }
       );
-
-      // Remove from wishlist
-      await removeItem(item._id);
+      removeItem(item.product._id);
+      alert("Moved to Cart!");
     } catch (err) {
       console.error("Move to Cart Error:", err);
     }
@@ -58,27 +56,27 @@ export default function Wishlist() {
 
   return (
     <div className="wishlist-container">
-
       <h2>Your Wishlist ❤️</h2>
-
       <div className="wishlist-grid">
         {wishlist.length === 0 ? (
           <p className="empty-text">No items in wishlist.</p>
         ) : (
           wishlist.map((item) => (
-            <div key={item._id} className="wishlist-card">
-              <img src={item.image} alt="" />
+            <div key={item.product._id} className="wishlist-card">
+              <img src={item.product.image} alt={item.product.name} />
+              <h3>{item.product.name}</h3>
+              <p>₹ {item.product.price}</p>
 
-              <h3>{item.name}</h3>
-              <p>₹ {item.price}</p>
-
-              <button className="move-btn" onClick={() => moveToCart(item)}>
+              <button
+                className="move-btn"
+                onClick={() => moveToCart(item)}
+              >
                 Move to Cart
               </button>
 
               <button
                 className="remove-btn"
-                onClick={() => removeItem(item._id)}
+                onClick={() => removeItem(item.product._id)}
               >
                 Remove
               </button>
@@ -86,7 +84,6 @@ export default function Wishlist() {
           ))
         )}
       </div>
-
     </div>
   );
 }

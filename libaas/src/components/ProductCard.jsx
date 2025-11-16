@@ -5,31 +5,41 @@ import ProductModal from "./ProductModal";
 import api from "../axiosConfig";
 import "./ProductCard.css";
 
-export default function ProductCard({ _id, image, name, price }) {
+export default function ProductCard({ product }) {
+  const { _id, image, name, price } = product;
+
   const [showModal, setShowModal] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
 
-  // ---------------- Load wishlist status ----------------
+  const token = localStorage.getItem("token");
+
+  // -------- Load Wishlist status --------
   useEffect(() => {
+    if (!token) return;
+
     const checkWishlist = async () => {
       try {
-        const res = await api.get("/api/user/wishlist"); // token handled in axiosConfig
-        const exists = res.data.wishlist.some((item) => item.product._id === _id);
+        const response = await api.get("/api/user/wishlist");
+
+        const exists = response.data.wishlist.some(
+          (item) => item.product._id === _id
+        );
+
         setWishlisted(exists);
       } catch (err) {
-        console.log(err);
+        console.log("Wishlist fetch error:", err);
       }
     };
 
     checkWishlist();
-  }, [_id]);
+  }, [_id, token]);
 
-  // ---------------- Toggle Wishlist ----------------
+  // -------- Toggle Wishlist --------
   const toggleWishlist = async () => {
-    try {
-      if (!localStorage.getItem("token")) return alert("Please login first!");
+    if (!token) return alert("Please login first!");
 
+    try {
       if (!wishlisted) {
         await api.post("/api/user/wishlist/add", { productId: _id });
         setWishlisted(true);
@@ -38,20 +48,20 @@ export default function ProductCard({ _id, image, name, price }) {
         setWishlisted(false);
       }
     } catch (err) {
-      console.log(err);
+      console.log("Wishlist toggle error:", err);
     }
   };
 
-  // ---------------- Add to Cart ----------------
+  // -------- Add to Cart --------
   const addToCart = async () => {
-    try {
-      if (!localStorage.getItem("token")) return alert("Please login first!");
+    if (!token) return alert("Please login first!");
 
+    try {
       await api.post("/api/user/cart/add", { productId: _id });
       setAddedToCart(true);
       alert("Added to Cart!");
     } catch (err) {
-      console.log(err);
+      console.log("Add to cart error:", err);
     }
   };
 
