@@ -2,7 +2,10 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authMiddleware");
 const User = require("../models/User");
-const Product = require("../models/Product");
+
+// -----------------------------------------------------------
+// ---------------------- WISHLIST ROUTES --------------------
+// -----------------------------------------------------------
 
 // ✅ GET WISHLIST
 router.get("/wishlist", auth, async (req, res) => {
@@ -10,7 +13,7 @@ router.get("/wishlist", auth, async (req, res) => {
     const user = await User.findById(req.user.id).populate("wishlist");
     res.json({ wishlist: user.wishlist });
   } catch (err) {
-    console.error(err);
+    console.error("Get Wishlist Error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -19,15 +22,17 @@ router.get("/wishlist", auth, async (req, res) => {
 router.post("/wishlist/add", auth, async (req, res) => {
   try {
     console.log("Wishlist Add Body:", req.body);
-    console.log("User:", req.user);
 
     const { productId } = req.body;
-    if (!productId) return res.status(400).json({ msg: "productId missing" });
+    if (!productId) {
+      return res.status(400).json({ msg: "productId missing" });
+    }
 
     const user = await User.findById(req.user.id);
 
+    // Already exists?
     if (user.wishlist.includes(productId)) {
-      return res.status(200).json({ msg: "Already in wishlist" });
+      return res.json({ msg: "Already in wishlist" });
     }
 
     user.wishlist.push(productId);
@@ -50,8 +55,9 @@ router.delete("/wishlist/remove/:id", auth, async (req, res) => {
     );
 
     await user.save();
-    res.json({ msg: "Removed", wishlist: user.wishlist });
+    res.json({ msg: "Removed from wishlist", wishlist: user.wishlist });
   } catch (err) {
+    console.error("Wishlist Remove Error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -66,6 +72,7 @@ router.get("/cart", auth, async (req, res) => {
     const user = await User.findById(req.user.id).populate("cart.product");
     res.json({ cart: user.cart });
   } catch (err) {
+    console.error("Get Cart Error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -74,10 +81,13 @@ router.get("/cart", auth, async (req, res) => {
 router.post("/cart/add", auth, async (req, res) => {
   try {
     const { productId } = req.body;
-    if (!productId) return res.status(400).json({ msg: "productId missing" });
+    if (!productId) {
+      return res.status(400).json({ msg: "productId missing" });
+    }
 
     const user = await User.findById(req.user.id);
 
+    // Already exists?
     const existing = user.cart.find(
       (item) => item.product.toString() === productId
     );
@@ -108,6 +118,7 @@ router.delete("/cart/remove/:id", auth, async (req, res) => {
     await user.save();
     res.json({ msg: "Removed from cart", cart: user.cart });
   } catch (err) {
+    console.error("Cart Remove Error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 });

@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 
-//
-// CART SCHEMA
-//
+// ------------------- CART ITEM SCHEMA -------------------
 const CartItemSchema = new mongoose.Schema(
   {
     product: {
@@ -18,9 +16,7 @@ const CartItemSchema = new mongoose.Schema(
   { _id: true }
 );
 
-//
-// USER SCHEMA
-//
+// ------------------- USER SCHEMA -------------------
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -38,7 +34,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
 
-  // SIMPLE ARRAY OF PRODUCT IDs
+  // SIMPLE ARRAY OF PRODUCT IDs FOR WISHLIST
   wishlist: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -46,6 +42,7 @@ const UserSchema = new mongoose.Schema({
     }
   ],
 
+  // CART: productId + quantity
   cart: {
     type: [CartItemSchema],
     default: [],
