@@ -1,8 +1,6 @@
+// backend/models/User.js
 const mongoose = require("mongoose");
 
-//
-// CART SCHEMA
-//
 const CartItemSchema = new mongoose.Schema(
   {
     product: {
@@ -18,10 +16,6 @@ const CartItemSchema = new mongoose.Schema(
   { _id: true }
 );
 
-//
-// WISHLIST SCHEMA
-// Store only product IDs
-//
 const WishlistItemSchema = new mongoose.Schema(
   {
     product: {
@@ -33,41 +27,13 @@ const WishlistItemSchema = new mongoose.Schema(
   { _id: true }
 );
 
-//
-// USER SCHEMA
-//
 const UserSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
-    required: true 
-  },
-
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true 
-  },
-
-  password: { 
-    type: String, 
-    required: true 
-  },
-
-  // UPDATED FIELDS
-  cart: {
-    type: [CartItemSchema],
-    default: []
-  },
-
-  wishlist: {
-    type: [WishlistItemSchema],
-    default: []
-  },
-
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
-  }
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  cart: { type: [CartItemSchema], default: [] },
+  wishlist: { type: [WishlistItemSchema], default: [] },
+  createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model("User", UserSchema);

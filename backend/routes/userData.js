@@ -1,8 +1,9 @@
+// backend/routes/userData.js
 const router = require("express").Router();
 const User = require("../models/User");
 const auth = require("../middleware/authMiddleware");
 
-// ------------------- WISHLIST ---------------------
+// ---------------- WISHLIST ----------------
 
 // GET wishlist
 router.get("/wishlist", auth, async (req, res) => {
@@ -18,16 +19,18 @@ router.get("/wishlist", auth, async (req, res) => {
 // ADD to wishlist
 router.post("/wishlist/add", auth, async (req, res) => {
   try {
+    const { productId } = req.body; // NOTE: expecting productId from frontend
     const user = await User.findById(req.user.id);
-    const product = req.body.product;
 
     // Prevent duplicates
     const exists = user.wishlist.some(
-      (item) => item.product.toString() === product._id
+      (item) => item.product.toString() === productId
     );
-    if (!exists) user.wishlist.push({ product: product._id });
+    if (!exists) {
+      user.wishlist.push({ product: productId });
+      await user.save();
+    }
 
-    await user.save();
     res.json({ msg: "Added to wishlist" });
   } catch (err) {
     console.log(err);
@@ -53,7 +56,7 @@ router.delete("/wishlist/remove/:id", auth, async (req, res) => {
   }
 });
 
-// ------------------- CART ---------------------
+// ---------------- CART -----------------
 
 // GET cart
 router.get("/cart", auth, async (req, res) => {
@@ -69,13 +72,19 @@ router.get("/cart", auth, async (req, res) => {
 // ADD to cart
 router.post("/cart/add", auth, async (req, res) => {
   try {
+    const { productId } = req.body; // expecting productId from frontend
     const user = await User.findById(req.user.id);
-    const product = req.body.product;
 
-    const exists = user.cart.some(
-      (item) => item.product.toString() === product._id
+    // Check if already in cart
+    const exists = user.cart.find(
+      (item) => item.product.toString() === productId
     );
-    if (!exists) user.cart.push({ product: product._id, quantity: 1 });
+
+    if (exists) {
+      exists.quantity += 1; // increment quantity
+    } else {
+      user.cart.push({ product: productId, quantity: 1 });
+    }
 
     await user.save();
     res.json({ msg: "Added to cart" });

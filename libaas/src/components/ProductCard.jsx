@@ -8,20 +8,14 @@ import "./ProductCard.css";
 export default function ProductCard({ _id, image, name, price }) {
   const [showModal, setShowModal] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
-  const token = localStorage.getItem("token");
-
-  // LOAD WISHLIST STATUS
+  // ---------------- Load wishlist status ----------------
   useEffect(() => {
-    if (!token) return;
-
     const checkWishlist = async () => {
       try {
-        const res = await api.get("/api/user/wishlist", {
-          headers: { "x-auth-token": token }
-        });
-
-        const exists = res.data.wishlist.some((item) => item._id === _id);
+        const res = await api.get("/api/user/wishlist"); // token handled in axiosConfig
+        const exists = res.data.wishlist.some((item) => item.product._id === _id);
         setWishlisted(exists);
       } catch (err) {
         console.log(err);
@@ -29,26 +23,18 @@ export default function ProductCard({ _id, image, name, price }) {
     };
 
     checkWishlist();
-  }, [_id, token]);
+  }, [_id]);
 
-  // ❤️ TOGGLE WISHLIST
+  // ---------------- Toggle Wishlist ----------------
   const toggleWishlist = async () => {
-    if (!token) return alert("Please login first!");
-
     try {
+      if (!localStorage.getItem("token")) return alert("Please login first!");
+
       if (!wishlisted) {
-        // ADD
-        await api.post(
-          "/api/user/wishlist/add",
-          { productId: _id },
-          { headers: { "x-auth-token": token } }
-        );
+        await api.post("/api/user/wishlist/add", { productId: _id });
         setWishlisted(true);
       } else {
-        // REMOVE
-        await api.delete(`/api/user/wishlist/remove/${_id}`, {
-          headers: { "x-auth-token": token }
-        });
+        await api.delete(`/api/user/wishlist/remove/${_id}`);
         setWishlisted(false);
       }
     } catch (err) {
@@ -56,17 +42,13 @@ export default function ProductCard({ _id, image, name, price }) {
     }
   };
 
-  // 🛒 ADD TO CART
+  // ---------------- Add to Cart ----------------
   const addToCart = async () => {
-    if (!token) return alert("Please login first!");
-
     try {
-      await api.post(
-        "/api/user/cart/add",
-        { productId: _id },
-        { headers: { "x-auth-token": token } }
-      );
+      if (!localStorage.getItem("token")) return alert("Please login first!");
 
+      await api.post("/api/user/cart/add", { productId: _id });
+      setAddedToCart(true);
       alert("Added to Cart!");
     } catch (err) {
       console.log(err);
@@ -79,18 +61,19 @@ export default function ProductCard({ _id, image, name, price }) {
         <div className="image-wrapper">
           <img src={image} alt={name} className="product-image" />
 
-          {/* ❤️ Wishlist */}
+          {/* Wishlist Heart */}
           <div className="icon-circle wishlist" onClick={toggleWishlist}>
             {wishlisted ? <FaHeart color="red" /> : <FaRegHeart />}
           </div>
 
+          {/* Action Icons */}
           <div className="action-icons">
             <div className="icon-circle" onClick={() => setShowModal(true)}>
               <FaEye />
             </div>
 
             <div className="icon-circle" onClick={addToCart}>
-              <FaShoppingCart />
+              <FaShoppingCart color={addedToCart ? "green" : "black"} />
             </div>
           </div>
         </div>
