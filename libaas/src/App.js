@@ -1,5 +1,4 @@
-// src/App.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,11 +7,12 @@ import {
 } from "react-router-dom";
 
 // Components
+import Home from "./components/Home";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 // Pages
-import Home from "./components/Home";
+
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 
@@ -25,30 +25,28 @@ import AmbarsariApsaras from "./pages/AmbarsariApsaras";
 import AboutUs from "./pages/AboutUs";
 import SizeChart from "./pages/SizeChart";
 
-// ⭐ Wishlist Page
+// ⭐ Wishlist & Cart Pages
 import Wishlist from "./pages/Wishlist";
-
-// ⭐ Cart Page
 import Cart from "./pages/Cart";
 
-// ✅ Layout Wrapper (handles Navbar/Footer visibility)
+// ✅ Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+// ✅ Layout Wrapper
 function Layout({ children }) {
   const location = useLocation();
-
-  // Hide Navbar & Footer only on Login/Signup
-  const hideLayout =
-    location.pathname === "/login" || location.pathname === "/signup";
+  const hideLayout = location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
       {!hideLayout && <Navbar />}
-      <main
-        style={{
-          marginTop: hideLayout ? "0" : "80px",
-          minHeight: "80vh",
-          backgroundColor: "#fff",
-        }}
-      >
+      <main style={{ marginTop: hideLayout ? "0" : "80px", minHeight: "80vh", backgroundColor: "#fff" }}>
         {children}
       </main>
       {!hideLayout && <Footer />}
@@ -56,9 +54,11 @@ function Layout({ children }) {
   );
 }
 
+// ✅ App Component
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Layout>
         <Routes>
           {/* Main Pages */}
@@ -66,10 +66,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 
-          {/* ⭐ Wishlist Page */}
+          {/* ⭐ Wishlist & Cart */}
           <Route path="/wishlist" element={<Wishlist />} />
-
-          {/* ⭐ Cart Page */}
           <Route path="/cart" element={<Cart />} />
 
           {/* Category Pages */}
@@ -81,17 +79,11 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/size-chart" element={<SizeChart />} />
 
-          {/* 404 Fallback */}
+          {/* 404 */}
           <Route
             path="*"
             element={
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "100px",
-                  fontSize: "1.2rem",
-                }}
-              >
+              <div style={{ textAlign: "center", padding: "100px", fontSize: "1.2rem" }}>
                 <h2>404 — Page Not Found</h2>
                 <p>Oops! The page you’re looking for doesn’t exist.</p>
               </div>
