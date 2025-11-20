@@ -15,13 +15,19 @@ export default function ProductCard({ product }) {
 
   const token = localStorage.getItem("token");
 
+  // Fetch wishlist to check if this product exists
   useEffect(() => {
     if (!token || !_id) return;
 
     const checkWishlist = async () => {
       try {
-        const response = await api.get("/api/user/wishlist", { headers: { "x-auth-token": token } });
-        const exists = response.data.wishlist.some(item => item._id === _id);
+        const response = await api.get("/api/user/wishlist");
+
+        // FIX: Compare ObjectId properly
+        const exists = response.data.wishlist.some(
+          (item) => item._id.toString() === _id.toString()
+        );
+
         setWishlisted(exists);
       } catch (err) {
         console.log("Wishlist fetch error:", err);
@@ -33,27 +39,31 @@ export default function ProductCard({ product }) {
 
   if (!product) return null;
 
+  // Toggle Wishlist (Add/Remove)
   const toggleWishlist = async () => {
     if (!token) return alert("Please login first!");
 
     try {
       if (!wishlisted) {
-        await api.post("/api/user/wishlist/add", { productId: _id }, { headers: { "x-auth-token": token } });
-        setWishlisted(true);
+        await api.post("/api/user/wishlist/add", { productId: _id });
       } else {
-        await api.delete(`/api/user/wishlist/remove/${_id}`, { headers: { "x-auth-token": token } });
-        setWishlisted(false);
+        await api.delete(`/api/user/wishlist/remove/${_id}`);
       }
+
+      // FIX: Instant UI update
+      setWishlisted((prev) => !prev);
+
     } catch (err) {
       console.log("Wishlist toggle error:", err);
     }
   };
 
+  // Add to Cart
   const addToCart = async () => {
     if (!token) return alert("Please login first!");
 
     try {
-      await api.post("/api/user/cart/add", { productId: _id }, { headers: { "x-auth-token": token } });
+      await api.post("/api/user/cart/add", { productId: _id });
       alert("Added to Cart!");
     } catch (err) {
       console.log("Add to cart error:", err);
@@ -65,22 +75,35 @@ export default function ProductCard({ product }) {
       <div className="product-card">
         <div className="image-wrapper">
           <img src={image} alt={name} className="product-image" />
+
+          {/* Wishlist Icon */}
           <div className="icon-circle wishlist" onClick={toggleWishlist}>
             {wishlisted ? <FaHeart color="red" /> : <FaRegHeart />}
           </div>
+
+          {/* Action Buttons */}
           <div className="action-icons">
-            <div className="icon-circle" onClick={() => setShowModal(true)}><FaEye /></div>
-            <div className="icon-circle" onClick={addToCart}><FaShoppingCart /></div>
+            <div className="icon-circle" onClick={() => setShowModal(true)}>
+              <FaEye />
+            </div>
+            <div className="icon-circle" onClick={addToCart}>
+              <FaShoppingCart />
+            </div>
           </div>
         </div>
+
         <div className="product-info">
           <h3>{name}</h3>
           <p className="product-price">₹ {price}</p>
         </div>
       </div>
 
+      {/* Product Modal */}
       {showModal && (
-        <ProductModal product={{ _id, name, image, price }} onClose={() => setShowModal(false)} />
+        <ProductModal
+          product={{ _id, name, image, price }}
+          onClose={() => setShowModal(false)}
+        />
       )}
     </>
   );

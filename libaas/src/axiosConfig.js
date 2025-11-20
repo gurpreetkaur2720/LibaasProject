@@ -2,14 +2,15 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:5000",
+  withCredentials: true, 
 });
 
-// Attach token automatically
+// Send token with every request
 api.interceptors.request.use(
   (config) => {
-    let token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
     if (token) {
-      config.headers["x-auth-token"] = token;
+      config.headers["x-auth-token"] = token; // ⭐ Token always attached
     }
     return config;
   },
