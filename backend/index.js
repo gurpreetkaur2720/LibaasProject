@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const AuthRouter = require("./routes/AuthRouter");
+const ProductRouter = require("./routes/ProductRouter");
 
 require('dotenv').config();
 const connectDB = require("./config/db");
@@ -13,8 +14,10 @@ const connectDB = require("./config/db");
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.use('/auth', AuthRouter);
 
+
+app.use('/auth', AuthRouter);
+app.use('/products', ProductRouter);
 
 // Test route
 app.get("/", (req, res) => {

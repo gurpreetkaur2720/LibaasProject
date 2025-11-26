@@ -31,10 +31,15 @@ const signup = async (req, res) => {
 
         await newUser.save();
 
+        const userInfo = {
+            name: newUser.name,
+            email: newUser.email
+        }
+
         return res.status(201).json({
             message: "User created successfully",
             success: true,
-            user: newUser
+            user: userInfo
         });
 
     } catch (error) {
