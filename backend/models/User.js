@@ -11,13 +11,25 @@ const CartItemSchema = new mongoose.Schema({
 }, { _id: true });
 
 // User schema
+// const UserSchema = new mongoose.Schema({
+//   name: { type: String, required: true },
+//   email: { type: String, required: true, unique: true },
+//   password: { type: String, required: true },
+//   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+//   cart: { type: [CartItemSchema], default: [] },
+//   createdAt: { type: Date, default: Date.now },
+// });
+
+
+
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-  cart: { type: [CartItemSchema], default: [] },
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("User", UserSchema);
+
+const userModel = mongoose.model("users", UserSchema);
+
+module.exports = userModel;

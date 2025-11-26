@@ -1,7 +1,7 @@
 // config/db.js
 const mongoose = require("mongoose");
 
-const ConnUrl = "mongodb+srv://prasenjitagt:8119@cluster0.fywalr2.mongodb.net/?appName=Cluster0";
+const ConnUrl = process.env.MONGODB_URI;
 
 const connectDB = async () => {
     try {
