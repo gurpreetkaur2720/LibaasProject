@@ -13,22 +13,41 @@ function Login() {
     e.preventDefault();
     try {
       // send request to backend
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post("http://localhost:8080/auth/login", {
         email,
         password,
       });
 
       // store token & user data in localStorage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      // localStorage.setItem("token", res.data.token);
+      // localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      alert(res.data.msg || "✅ Login successful!");
+      const { message, success, jwtToken, email: serverEmail, name } = res.data;
 
-      // redirect to homepage or dashboard
-      navigate("/");
+      if (success) {
+        // store token & user data in localStorage
+        localStorage.setItem("token", jwtToken);
+        localStorage.setItem("loggedInUser", name || serverEmail || "");
+        alert(message || "✅ Login successful!");
+
+        // redirect to homepage or dashboard
+        navigate("/");
+
+
+      }
     } catch (err) {
-      console.error("Login error:", err);
-      alert(err.response?.data?.msg || "❌ Invalid email or password!");
+
+
+      let alertMsg;
+      if (err.response.status === 403) {
+        alertMsg = err.response.data.message;
+      }
+      else {
+        const errorDetailsObj = err.response.data.error.details[0];
+        alertMsg = Object.values(errorDetailsObj)[0];
+      }
+
+      alert(alertMsg || "❌ Login failed — try again.");
     }
   };
 

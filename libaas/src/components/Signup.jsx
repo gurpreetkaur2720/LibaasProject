@@ -21,13 +21,17 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
+
+      const res = await axios.post("http://localhost:8080/auth/signup", formData);
       alert(res.data.msg || "✅ Signup successful!");
       navigate("/login"); // redirect to login page
       console.log("User Registered:", res.data.user);
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.msg || "❌ Signup failed — try again.");
+      const errorDetailsObj = err.response.data.error.details[0];
+      console.error(errorDetailsObj);
+      const alertMsg = Object.values(errorDetailsObj)[0];
+
+      alert(alertMsg || "❌ Signup failed — try again.");
     }
   };
 
