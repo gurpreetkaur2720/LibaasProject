@@ -1,6 +1,6 @@
-const wishlistModel = require("../models/Wishlist");
+const wishlistModel = require("../models/WishlistModel");
 
-const userModel = require("../models/User");
+const userModel = require("../models/UserModel");
 
 // GET Wishlist (Token → extract user)
 const getWishlist = async (req, res) => {
