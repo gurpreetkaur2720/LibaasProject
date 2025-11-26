@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const AuthRouter = require("./routes/AuthRouter");
 const ProductRouter = require("./routes/ProductRouter");
+const WishlistRouter = require("./routes/WishlistRouter");
 
 require('dotenv').config();
 const connectDB = require("./config/db");
@@ -18,6 +19,8 @@ app.use(cors());
 
 app.use('/auth', AuthRouter);
 app.use('/products', ProductRouter);
+app.use('/wishlist', WishlistRouter);
+
 
 // Test route
 app.get("/", (req, res) => {

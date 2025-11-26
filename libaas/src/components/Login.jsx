@@ -18,16 +18,13 @@ function Login() {
         password,
       });
 
-      // store token & user data in localStorage
-      // localStorage.setItem("token", res.data.token);
-      // localStorage.setItem("user", JSON.stringify(res.data.user));
-
       const { message, success, jwtToken, email: serverEmail, name } = res.data;
 
       if (success) {
         // store token & user data in localStorage
         localStorage.setItem("token", jwtToken);
-        localStorage.setItem("loggedInUser", name || serverEmail || "");
+        localStorage.setItem("email", serverEmail);
+        localStorage.setItem("loggedInUser", name);
         alert(message || "✅ Login successful!");
 
         // redirect to homepage or dashboard
@@ -36,18 +33,20 @@ function Login() {
 
       }
     } catch (err) {
+      console.log(err);
 
 
-      let alertMsg;
-      if (err.response.status === 403) {
-        alertMsg = err.response.data.message;
-      }
-      else {
-        const errorDetailsObj = err.response.data.error.details[0];
-        alertMsg = Object.values(errorDetailsObj)[0];
-      }
+      // let alertMsg;
+      // if (err.response.status === 403) {
+      //   alertMsg = err.response.data.message;
+      // }
+      // else {
+      //   const errorDetailsObj = err.response.data.error.details[0];
+      //   alertMsg = Object.values(errorDetailsObj)[0];
+      // }
 
-      alert(alertMsg || "❌ Login failed — try again.");
+      // alert(alertMsg || "❌ Login failed — try again.");
+      alert("❌ Login failed — try again.");
     }
   };
 

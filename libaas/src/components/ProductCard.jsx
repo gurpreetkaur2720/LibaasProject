@@ -3,12 +3,14 @@ import { FaHeart, FaRegHeart, FaShoppingCart, FaEye } from "react-icons/fa";
 import ProductModal from "./ProductModal";
 import api from "../axiosConfig";
 import "./ProductCard.css";
+import axios from "axios";
 
 export default function ProductCard({ product }) {
   const _id = product?._id;
   const image = product?.image;
   const name = product?.name;
   const price = product?.price;
+  const baseUrl = "http://localhost:8080/wishlist";
 
   const [showModal, setShowModal] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
@@ -17,25 +19,33 @@ export default function ProductCard({ product }) {
 
   // Fetch wishlist to check if this product exists
   useEffect(() => {
-    if (!token || !_id) return;
+    const fetchWishlist = async () => {
+      if (!token) return;
 
-    const checkWishlist = async () => {
       try {
-        const response = await api.get("/api/user/wishlist");
+        const res = await axios.get(baseUrl, {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        });
 
-        // FIX: Compare ObjectId properly
-        const exists = response.data.wishlist.some(
-          (item) => item._id.toString() === _id.toString()
+        const wishlistItems = res.data.wishlist || [];
+
+        // Check if this product exists
+        const isWishlisted = wishlistItems.some(
+          (item) => item.productId === _id || item._id === _id
         );
 
-        setWishlisted(exists);
+        setWishlisted(isWishlisted);
+
       } catch (err) {
-        console.log("Wishlist fetch error:", err);
+        console.log("Fetch wishlist error:", err);
       }
     };
 
-    checkWishlist();
-  }, [_id, token]);
+    fetchWishlist();
+  }, [_id]);
+
 
   if (!product) return null;
 
@@ -43,14 +53,30 @@ export default function ProductCard({ product }) {
   const toggleWishlist = async () => {
     if (!token) return alert("Please login first!");
 
+
+
     try {
       if (!wishlisted) {
-        await api.post("/api/user/wishlist/add", { productId: _id });
+        // ADD to wishlist
+        await axios.post(
+          `${baseUrl}/add`,
+          { productId: _id, image },
+          {
+            headers: {
+              Authorization: localStorage.getItem("token"),
+            },
+          }
+        );
       } else {
-        await api.delete(`/api/user/wishlist/remove/${_id}`);
+        // REMOVE from wishlist
+        await axios.delete(`${baseUrl}/remove`, {
+          data: { productId: _id }, // IMPORTANT
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        });
       }
 
-      // FIX: Instant UI update
       setWishlisted((prev) => !prev);
 
     } catch (err) {
@@ -58,12 +84,13 @@ export default function ProductCard({ product }) {
     }
   };
 
+
   // Add to Cart
   const addToCart = async () => {
     if (!token) return alert("Please login first!");
 
     try {
-      await api.post("/api/user/cart/add", { productId: _id });
+      await api.post("/api/user/cart/add", { productId: _id, image });
       alert("Added to Cart!");
     } catch (err) {
       console.log("Add to cart error:", err);
