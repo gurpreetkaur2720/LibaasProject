@@ -5,11 +5,11 @@ import "./Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user")); // check login state
+  const loggedInUser = localStorage.getItem("loggedInUser"); // check login state
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("loggedInUser");
     navigate("/login");
   };
 
@@ -36,10 +36,10 @@ const Navbar = () => {
         <Link to="/cart" className="icon">🛒</Link>
 
         {/* Conditional rendering */}
-        {user ? (
+        {loggedInUser ? (
           <div className="user-info">
             <span className="username">
-              Hi, <b>{user.name}</b>
+              Hi, <b>{loggedInUser}</b>
             </span>
             <button className="btn logout-btn" onClick={handleLogout}>
               Logout

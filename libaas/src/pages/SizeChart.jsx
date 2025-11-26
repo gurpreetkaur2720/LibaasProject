@@ -1,6 +1,4 @@
-import React from "react";
 import "./SizeChart.css";
-import sizeImg from "../assets/images/size_chart.jpg"; 
 
 export default function SizeChart() {
   return (
@@ -59,13 +57,13 @@ export default function SizeChart() {
 
       {/* Image */}
       <div className="size-img">
-        <img src={sizeImg} alt="Size Measurement Guide" />
+        <img src={"/images/size_chart.jpg"} alt="Size Measurement Guide" />
       </div>
 
       {/* Note */}
       <p className="size-note">
         Sizes can vary from 2-3 centimeters because they are measured by hand.
-        1 inch = 2.54 cm.  
+        1 inch = 2.54 cm.
         The size mentioned on a label can differ from the one you have ordered.
       </p>
     </div>

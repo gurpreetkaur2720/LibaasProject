@@ -1,13 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import footerBanner from "../assets/images/footer_banner.jpg";
 import "./Footer.css";
 
 export default function Footer() {
   return (
     <footer
       className="footer"
-      style={{ backgroundImage: `url(${footerBanner})` }}
+      style={{
+        backgroundImage: `url("/images/footer_banner.jpg")`
+
+      }}
       aria-label="Site footer"
     >
       <div className="footer__overlay" />

@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 
 // Components
@@ -28,6 +29,7 @@ import SizeChart from "./pages/SizeChart";
 // ⭐ Wishlist & Cart Pages
 import Wishlist from "./pages/Wishlist";
 import Cart from "./pages/Cart";
+import RefreshHandler from "./components/RefreshHandler";
 
 // ✅ Scroll to top on route change
 function ScrollToTop() {
@@ -56,13 +58,23 @@ function Layout({ children }) {
 
 // ✅ App Component
 function App() {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const PrivateRoute = ({ element }) => {
+    return isAuthenticated ? element : <Navigate to="/login" />
+  }
+
+
+
   return (
     <Router>
       <ScrollToTop />
       <Layout>
+        <RefreshHandler setIsAuthenticated={setIsAuthenticated} />
         <Routes>
           {/* Main Pages */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<PrivateRoute element={<Home />} />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
 

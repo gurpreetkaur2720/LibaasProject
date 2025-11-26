@@ -2,7 +2,6 @@ import React from "react";
 import ProductCard from "../components/ProductCard";
 import "../components/ProductCard.css";
 import "./Home.css";
-import bannerImg from "../assets/images/bb6.jpg";
 
 // ⭐ Updated Featured Products (MongoDB _id)
 const featuredProducts = [
@@ -33,7 +32,7 @@ export default function Home() {
     <div className="home-page">
 
       {/* Banner Section */}
-      <div className="home-banner" style={{ backgroundImage: `url(${bannerImg})` }}>
+      <div className="home-banner" style={{ backgroundImage: `url(/images/bb6.jpg)` }}>
         <div className="home-banner-content">
           <h1>LIBAAS</h1>
           <p>Welcome to LIBAAS — Discover Our New Fashion Trends</p>

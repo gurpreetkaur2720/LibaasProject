@@ -1,13 +1,12 @@
 import React from "react";
 import "./AboutUs.css";
-import bannerImg from "../assets/images/pehrin9.jpg"; // replace with your banner image
 
 export default function AboutUs() {
   return (
     <div className="about-page">
       {/* Banner Section */}
       <div className="about-banner">
-        <img src={bannerImg} alt="Libaas Story" className="banner-image" />
+        <img src={"/images/pehrin9.jpg"} alt="Libaas Story" className="banner-image" />
         <div className="banner-text">
           <h1>Our Story</h1>
         </div>
