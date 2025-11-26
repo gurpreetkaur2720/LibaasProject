@@ -10,7 +10,7 @@ export default function Wishlist() {
   const [workingId, setWorkingId] = useState(null); // id for item currently being processed (disable buttons)
   const token = localStorage.getItem("token");
   const wishlistBase = "http://localhost:8080/wishlist";
-  const cartUpdateUrl = "http://localhost:8080/cart/update"; // your unified route
+  const cartUpdateUrl = "http://localhost:8080/cart/update";
 
   // Fetch wishlist → convert productId → product object
   useEffect(() => {
@@ -77,7 +77,6 @@ export default function Wishlist() {
 
     try {
       // 1) Add to cart via update endpoint - action: add
-      // Use PUT as recommended; if your server expects POST that's fine — change accordingly.
       const payload = {
         productId,
         action: "add",
