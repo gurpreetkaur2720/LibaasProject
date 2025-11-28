@@ -2,7 +2,7 @@ import React from "react";
 import ProductCard from "../components/ProductCard";
 import "../components/ProductCard.css";
 import "../pages/PageStyles.css";
-import { products } from "../data/productData";
+import { bollywoodBegums } from "../data/productData";
 
 export default function BollywoodBegums() {
   return (
@@ -17,7 +17,7 @@ export default function BollywoodBegums() {
       <div className="category-box">
         <h2 className="category-heading">Bollywood Begums</h2>
         <div className="product-grid">
-          {products.map((item) => (
+          {bollywoodBegums.map((item) => (
             <ProductCard key={item._id} product={item} />
           ))}
         </div>

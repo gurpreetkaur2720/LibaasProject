@@ -2,27 +2,26 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./Cart.css";
-import { products } from "../data/productData";
+import { allProducts } from "../data/productData";   // ✅ UPDATED
 
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([]); // { productId, quantity, product? }
+  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [workingId, setWorkingId] = useState(null); // productId being updated
+  const [workingId, setWorkingId] = useState(null);
   const token = localStorage.getItem("token");
 
-  const cartGetUrl = "http://localhost:8080/cart"; // GET
-  const cartUpdateUrl = "http://localhost:8080/cart/update"; // PUT
+  const cartGetUrl = "http://localhost:8080/cart";
+  const cartUpdateUrl = "http://localhost:8080/cart/update";
 
-  // helper: map server items (productId, quantity) -> enriched items with product object
+  // UPDATED → products → allProducts
   const mapItemsToProducts = (items = []) =>
     items
       .map((it) => {
-        const product = products.find((p) => p._id === it.productId) || null;
+        const product = allProducts.find((p) => p._id === it.productId) || null;
         return { ...it, product };
       })
-      .filter((it) => it.product !== null); // drop items that don't match local products
+      .filter((it) => it.product !== null);
 
-  // fetch cart on mount
   useEffect(() => {
     const fetchCart = async () => {
       setLoading(true);
@@ -37,7 +36,6 @@ export default function Cart() {
           headers: { Authorization: token },
         });
 
-        // backend returns { success: true, cart: { items: [{ productId, quantity }], ... } }
         const rawItems = res?.data?.cart?.items ?? [];
         const mapped = mapItemsToProducts(rawItems);
         setCartItems(mapped);
@@ -52,7 +50,6 @@ export default function Cart() {
     fetchCart();
   }, [token]);
 
-  // compute total using local products
   const total = useMemo(() => {
     return cartItems.reduce((sum, it) => {
       const price = Number(it.product?.price ?? 0);
@@ -61,13 +58,11 @@ export default function Cart() {
     }, 0);
   }, [cartItems]);
 
-  // update quantity helper (set exact quantity)
   const updateQuantity = async (productId, newQty) => {
     if (!token) return alert("Please login first!");
-    if (newQty < 1) return; // guard: use remove for deleting
+    if (newQty < 1) return;
 
     setWorkingId(productId);
-    // optimistic UI: update locally and revert on failure
     const prev = [...cartItems];
     setCartItems((prevList) =>
       prevList.map((it) => (it.productId === productId ? { ...it, quantity: newQty } : it))
@@ -79,17 +74,15 @@ export default function Cart() {
         { productId, action: "set", quantity: newQty },
         { headers: { Authorization: token } }
       );
-      // success — backend saved; nothing else to do
     } catch (err) {
       console.error("Failed to update quantity:", err);
       alert(err?.response?.data?.message || "Could not update quantity. Reverting.");
-      setCartItems(prev); // revert
+      setCartItems(prev);
     } finally {
       setWorkingId(null);
     }
   };
 
-  // remove item
   const removeItem = async (productId) => {
     if (!token) return alert("Please login first!");
     if (!window.confirm("Remove this item from your cart?")) return;
@@ -107,13 +100,12 @@ export default function Cart() {
     } catch (err) {
       console.error("Failed to remove item:", err);
       alert(err?.response?.data?.message || "Could not remove item. Reverting.");
-      setCartItems(prev); // revert
+      setCartItems(prev);
     } finally {
       setWorkingId(null);
     }
   };
 
-  // decrement helper (if hits 0, remove)
   const decrement = (productId, currentQty) => {
     const next = Math.max(0, currentQty - 1);
     if (next === 0) {

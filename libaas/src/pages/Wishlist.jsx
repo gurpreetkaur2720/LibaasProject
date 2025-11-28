@@ -2,17 +2,16 @@
 import axios from "axios";
 import "./Wishlist.css";
 import { useEffect, useState } from "react";
-import { products } from "../data/productData";
+import { allProducts } from "../data/productData";   // ✅ UPDATED
 
 export default function Wishlist() {
-  const [wishlist, setWishlist] = useState([]); // stores full product info
+  const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [workingId, setWorkingId] = useState(null); // id for item currently being processed (disable buttons)
+  const [workingId, setWorkingId] = useState(null);
   const token = localStorage.getItem("token");
   const wishlistBase = "http://localhost:8080/wishlist";
   const cartUpdateUrl = "http://localhost:8080/cart/update";
 
-  // Fetch wishlist → convert productId → product object
   useEffect(() => {
     const fetchWishlist = async () => {
       if (!token) {
@@ -28,12 +27,11 @@ export default function Wishlist() {
           headers: { Authorization: token },
         });
 
-        // backend gives: { wishlist: [{ productId: "..." }, ...] } or similar
         const raw = res?.data?.wishlist ?? res?.data ?? [];
         const ids = new Set((raw || []).map((w) => w.productId));
 
-        // match local products
-        const finalWishlist = products.filter((p) => ids.has(p._id));
+        // UPDATED → match local products using allProducts
+        const finalWishlist = allProducts.filter((p) => ids.has(p._id));
 
         setWishlist(finalWishlist);
       } catch (err) {
@@ -47,11 +45,9 @@ export default function Wishlist() {
     fetchWishlist();
   }, [token]);
 
-  // Remove from wishlist
   const removeItem = async (productId) => {
     if (!token) return alert("Please login first!");
 
-    // Optimistic UI update: remove locally first
     const prev = wishlist;
     setWishlist((prevList) => prevList.filter((item) => item._id !== productId));
 
@@ -63,12 +59,10 @@ export default function Wishlist() {
     } catch (err) {
       console.error("Failed to remove from wishlist:", err);
       alert("Could not remove item from wishlist. Reverting.");
-      // revert UI
       setWishlist(prev);
     }
   };
 
-  // Move to cart — uses unified update endpoint (PUT /cart/update)
   const moveToCart = async (product) => {
     if (!token) return alert("Please login first!");
 
@@ -76,24 +70,17 @@ export default function Wishlist() {
     setWorkingId(productId);
 
     try {
-      // 1) Add to cart via update endpoint - action: add
-      const payload = {
-        productId,
-        action: "add",
-        quantity: 1,
-      };
+      await axios.put(
+        cartUpdateUrl,
+        { productId, action: "add", quantity: 1 },
+        { headers: { Authorization: token } }
+      );
 
-      await axios.put(cartUpdateUrl, payload, {
-        headers: { Authorization: token },
-      });
-
-      // 2) If cart add succeeded, remove from wishlist
       await removeItem(productId);
 
       alert("Moved to cart successfully.");
     } catch (err) {
       console.error("Failed to move to cart:", err);
-      // better error message from server if present
       const msg =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
@@ -114,7 +101,7 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="wishlist-container">``
+    <div className="wishlist-container">
       <h2>Your Wishlist ❤️</h2>
 
       {wishlist.length === 0 ? (

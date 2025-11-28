@@ -1,0 +1,81 @@
+.payment-container {
+  padding: 30px;
+  max-width: 600px;
+  margin: auto;
+  font-family: "Poppins", sans-serif;
+}
+
+.payment-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.qr-section,
+.cod-section {
+  margin-top: 20px;
+}
+
+.qr-box {
+  width: 320px;
+  margin: auto;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #ddd;
+}
+
+.qr-scanner {
+  width: 100%;
+}
+
+.scan-text {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555;
+}
+
+.pay-btn {
+  display: block;
+  margin: 15px auto;
+  background: #1ab21a;
+  color: white;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.pay-btn:hover {
+  background: #119911;
+}
+
+.cod-btn {
+  background: #000;
+  color: white;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.cod-btn:hover {
+  background: #333;
+}
+
+.divider {
+  margin: 40px 0;
+  border: none;
+  border-bottom: 1px solid #ccc;
+}

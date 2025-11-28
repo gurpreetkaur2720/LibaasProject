@@ -13,9 +13,11 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 // Pages
-
 import Signup from "./components/Signup";
 import Login from "./components/Login";
+
+// My Orders Page ⭐
+import MyOrders from "./pages/MyOrders";
 
 // Category Pages
 import LahoriKudiyan from "./pages/LahoriKudiyan";
@@ -26,12 +28,12 @@ import AmbarsariApsaras from "./pages/AmbarsariApsaras";
 import AboutUs from "./pages/AboutUs";
 import SizeChart from "./pages/SizeChart";
 
-// ⭐ Wishlist & Cart Pages
+// Wishlist & Cart Pages
 import Wishlist from "./pages/Wishlist";
 import Cart from "./pages/Cart";
 import RefreshHandler from "./components/RefreshHandler";
 
-// ✅ Scroll to top on route change
+// Scroll to top
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -40,15 +42,22 @@ function ScrollToTop() {
   return null;
 }
 
-// ✅ Layout Wrapper
+// Layout Wrapper
 function Layout({ children }) {
   const location = useLocation();
-  const hideLayout = location.pathname === "/login" || location.pathname === "/signup";
+  const hideLayout =
+    location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
       {!hideLayout && <Navbar />}
-      <main style={{ marginTop: hideLayout ? "0" : "80px", minHeight: "80vh", backgroundColor: "#fff" }}>
+      <main
+        style={{
+          marginTop: hideLayout ? "0" : "80px",
+          minHeight: "80vh",
+          backgroundColor: "#fff",
+        }}
+      >
         {children}
       </main>
       {!hideLayout && <Footer />}
@@ -56,16 +65,13 @@ function Layout({ children }) {
   );
 }
 
-// ✅ App Component
+// App Component
 function App() {
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const PrivateRoute = ({ element }) => {
-    return isAuthenticated ? element : <Navigate to="/login" />
-  }
-
-
+    return isAuthenticated ? element : <Navigate to="/login" />;
+  };
 
   return (
     <Router>
@@ -82,6 +88,9 @@ function App() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
 
+          {/* ⭐ My Orders */}
+          <Route path="/my-orders" element={<MyOrders />} />
+
           {/* Category Pages */}
           <Route path="/lahori-kudiyan" element={<LahoriKudiyan />} />
           <Route path="/bollywood-begums" element={<BollywoodBegums />} />
@@ -95,7 +104,13 @@ function App() {
           <Route
             path="*"
             element={
-              <div style={{ textAlign: "center", padding: "100px", fontSize: "1.2rem" }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "100px",
+                  fontSize: "1.2rem",
+                }}
+              >
                 <h2>404 — Page Not Found</h2>
                 <p>Oops! The page you’re looking for doesn’t exist.</p>
               </div>

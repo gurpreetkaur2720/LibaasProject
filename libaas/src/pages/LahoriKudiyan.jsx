@@ -1,9 +1,8 @@
+import React from "react";
 import ProductCard from "../components/ProductCard";
 import "../components/ProductCard.css";
 import "../pages/PageStyles.css";
-import { products } from "../data/productData";
-
-
+import { lahoriKudiyan } from "../data/productData";
 
 export default function LahoriKudiyan() {
   return (
@@ -18,7 +17,7 @@ export default function LahoriKudiyan() {
       <div className="category-box">
         <h2 className="category-heading">Lahori Kudiyan</h2>
         <div className="product-grid">
-          {products.map((item) => (
+          {lahoriKudiyan.map((item) => (
             <ProductCard key={item._id} product={item} />
           ))}
         </div>

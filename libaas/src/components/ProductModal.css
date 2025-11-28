@@ -1,3 +1,4 @@
+/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -9,8 +10,10 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
+/* Modal content */
 .modal-content {
   background: #fff;
   width: 90%;
@@ -20,9 +23,10 @@
   overflow: hidden;
   position: relative;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  animation: scaleIn 0.3s ease;
 }
 
-/* Close Button */
+/* Close button */
 .modal-close {
   position: absolute;
   top: 15px;
@@ -38,16 +42,15 @@
   transform: scale(1.2);
 }
 
-/* Left side - Image */
+/* Left side image */
 .modal-left {
   flex: 1;
-  background: #f8f8f8;
+  background: #e3b85f; /* darker beige / yellow */
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 25px;
 }
-
 .modal-left img {
   max-width: 100%;
   max-height: 500px;
@@ -56,53 +59,72 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Right side - Details */
+/* Right side */
 .modal-right {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;  /* ✅ vertically centered */
+  align-items: center;
   padding: 30px;
-  background: #fff;
+  background: #e3b85f; 
 }
 
+/* Inner box */
 .details-box {
   width: 100%;
-  max-width: 400px; /* ✅ slightly smaller */
+  max-width: 400px;
   position: relative;
-  background: #f9fbff;
+  background: #fff;
   border: 1px solid #e1e7f5;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 28px 25px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  text-align: center;
 }
 
+/* Title */
 .product-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;           /* tighter spacing */
   color: #222;
 }
 
+/* NEW: price directly below title */
 .product-price {
+  font-size: 19px;
+  color: #e63946;               /* premium red */
+  font-weight: 700;
+  margin-bottom: 14px;          /* moved up */
+}
+
+/* Flower divider */
+.title-divider {
+  width: 100%;
+  margin: 4px 0 18px; 
   font-size: 18px;
-  color: #007bff; /* Blue price */
-  font-weight: bold;
-  margin-bottom: 20px;
+  color: #ff6b81;
+  display: flex;
+  justify-content: center;
+}
+.title-divider .flower {
+  display: inline-block;
+  transform: scale(1.2);
 }
 
 /* Wishlist button */
 .wishlist-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 12px;
+  right: 12px;
   border-radius: 50%;
   background: #fff;
   border: 1px solid #ddd;
-  padding: 6px;  /* ✅ smaller */
+  padding: 7px;
   cursor: pointer;
-  font-size: 16px; /* ✅ smaller */
+  font-size: 17px;
   transition: 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 .wishlist-btn:hover {
   background: #f5f5f5;
@@ -123,6 +145,7 @@
 .sizes {
   display: flex;
   gap: 10px;
+  justify-content: center;
   margin-bottom: 15px;
 }
 .size-btn {
@@ -130,21 +153,27 @@
   background: #fff;
   padding: 6px 12px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
-  transition: 0.2s;
+  transition: all 0.2s;
 }
 .size-btn:hover {
   background: #007bff;
   color: #fff;
   border-color: #007bff;
 }
+.size-btn.active {
+  background: #007bff;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
 
-/* Quantity */
+/* Quantity box */
 .quantity {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   margin-bottom: 20px;
 }
 .quantity button {
@@ -152,9 +181,8 @@
   border: none;
   padding: 6px 10px;
   cursor: pointer;
-  font-size: 14px;  /* ✅ smaller */
+  font-size: 14px;
   border-radius: 4px;
-  transition: background 0.2s;
 }
 .quantity button:hover {
   background: #ddd;
@@ -167,23 +195,22 @@
   border-radius: 4px;
 }
 
-/* Actions */
+/* Buttons */
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   margin-top: 10px;
 }
-
 .add-to-cart,
 .buy-now {
   flex: 1;
-  padding: 10px; /* ✅ smaller */
+  padding: 10px;
   border: none;
   cursor: pointer;
   border-radius: 6px;
   font-weight: 600;
-  font-size: 14px; /* ✅ smaller text */
-  transition: background 0.3s, transform 0.2s;
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
 .add-to-cart {
@@ -202,4 +229,14 @@
 .buy-now:hover {
   background: #6e6cdf;
   transform: translateY(-2px);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
