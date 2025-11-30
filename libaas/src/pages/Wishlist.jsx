@@ -2,16 +2,21 @@
 import axios from "axios";
 import "./Wishlist.css";
 import { useEffect, useState } from "react";
-import { allProducts } from "../data/productData";   // ✅ UPDATED
+import { allProducts } from "../data/productData";
+import { FaEye } from "react-icons/fa";
+import ProductModal from "../components/ProductModal"; // ✅ IMPORTANT
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [workingId, setWorkingId] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null); // ✅ MODAL STATE
   const token = localStorage.getItem("token");
+
   const wishlistBase = "http://localhost:8080/wishlist";
   const cartUpdateUrl = "http://localhost:8080/cart/update";
 
+  // Load wishlist
   useEffect(() => {
     const fetchWishlist = async () => {
       if (!token) {
@@ -28,9 +33,8 @@ export default function Wishlist() {
         });
 
         const raw = res?.data?.wishlist ?? res?.data ?? [];
-        const ids = new Set((raw || []).map((w) => w.productId));
+        const ids = new Set(raw.map((w) => w.productId));
 
-        // UPDATED → match local products using allProducts
         const finalWishlist = allProducts.filter((p) => ids.has(p._id));
 
         setWishlist(finalWishlist);
@@ -45,6 +49,7 @@ export default function Wishlist() {
     fetchWishlist();
   }, [token]);
 
+  // Remove item
   const removeItem = async (productId) => {
     if (!token) return alert("Please login first!");
 
@@ -58,11 +63,12 @@ export default function Wishlist() {
       });
     } catch (err) {
       console.error("Failed to remove from wishlist:", err);
-      alert("Could not remove item from wishlist. Reverting.");
+      alert("Could not remove item. Reverting.");
       setWishlist(prev);
     }
   };
 
+  // Move to Cart
   const moveToCart = async (product) => {
     if (!token) return alert("Please login first!");
 
@@ -80,11 +86,10 @@ export default function Wishlist() {
 
       alert("Moved to cart successfully.");
     } catch (err) {
-      console.error("Failed to move to cart:", err);
       const msg =
         err?.response?.data?.message ||
         err?.response?.data?.error ||
-        "Could not move item to cart. Please try again.";
+        "Could not move item to cart.";
       alert(msg);
     } finally {
       setWorkingId(null);
@@ -101,42 +106,67 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="wishlist-container">
-      <h2>Your Wishlist ❤️</h2>
+    <>
+      <div className="wishlist-container">
+        <h2>Your Wishlist ❤️</h2>
 
-      {wishlist.length === 0 ? (
-        <p className="empty-text">No items in wishlist.</p>
-      ) : (
-        <div className="wishlist-grid">
-          {wishlist.map((p) => (
-            <div key={p._id} className="wishlist-card">
-              <img src={p.image || "/images/placeholder.png"} alt={p.name} />
-              <h3>{p.name}</h3>
-              <p>₹ {p.price}</p>
+        {wishlist.length === 0 ? (
+          <p className="empty-text">No items in wishlist.</p>
+        ) : (
+          <div className="wishlist-grid">
+            {wishlist.map((p) => (
+              <div key={p._id} className="wishlist-card">
+                <div className="wishlist-img-wrapper">
+                  <img src={p.image} alt={p.name} />
 
-              <button
-                className="move-btn"
-                onClick={() => moveToCart(p)}
-                disabled={workingId === p._id}
-              >
-                {workingId === p._id ? "Moving..." : "Move to Cart"}
-              </button>
+                  {/* 👁 VIEW ICON */}
+                  <div
+                    className="view-icon"
+                    onClick={() => setSelectedProduct(p)}
+                  >
+                    <FaEye />
+                  </div>
+                </div>
 
-              <button
-                className="remove-btn"
-                onClick={() => {
-                  if (window.confirm("Remove this item?")) {
-                    removeItem(p._id);
-                  }
-                }}
-                disabled={workingId === p._id}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-        </div>
+                <h3>{p.name}</h3>
+
+                {/* ⭐ description added */}
+                {p.description && (
+                  <p className="wl-description">{p.description}</p>
+                )}
+
+                <p className="wl-price">₹ {p.price}</p>
+
+                <button
+                  className="move-btn"
+                  onClick={() => moveToCart(p)}
+                  disabled={workingId === p._id}
+                >
+                  {workingId === p._id ? "Moving..." : "Move to Cart"}
+                </button>
+
+                <button
+                  className="remove-btn"
+                  onClick={() => {
+                    if (window.confirm("Remove this item?")) removeItem(p._id);
+                  }}
+                  disabled={workingId === p._id}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* PRODUCT MODAL */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
       )}
-    </div>
+    </>
   );
 }

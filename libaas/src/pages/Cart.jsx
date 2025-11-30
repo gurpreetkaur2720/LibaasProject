@@ -2,18 +2,21 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import "./Cart.css";
-import { allProducts } from "../data/productData";   // ✅ UPDATED
+import { allProducts } from "../data/productData";
+import { FaEye } from "react-icons/fa"; // Eye icon
+import ProductModal from "../components/ProductModal"; 
+
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [workingId, setWorkingId] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null); // For modal
   const token = localStorage.getItem("token");
 
   const cartGetUrl = "http://localhost:8080/cart";
   const cartUpdateUrl = "http://localhost:8080/cart/update";
 
-  // UPDATED → products → allProducts
   const mapItemsToProducts = (items = []) =>
     items
       .map((it) => {
@@ -125,58 +128,90 @@ export default function Cart() {
   }
 
   return (
-    <div className="cart-container">
-      <h2>Your Cart 🛒</h2>
+    <>
+      <div className="cart-container">
+        <h2>Your Cart 🛒</h2>
 
-      {cartItems.length === 0 ? (
-        <p className="empty-text">Your cart is empty.</p>
-      ) : (
-        <>
-          <div className="cart-grid">
-            {cartItems.map((item) => (
-              <div key={item.product._id} className="cart-card">
-                <img src={item.product.image || "/images/placeholder.png"} alt={item.product.name} />
-                <h3>{item.product.name}</h3>
-                <p>₹ {item.product.price}</p>
+        {cartItems.length === 0 ? (
+          <p className="empty-text">Your cart is empty.</p>
+        ) : (
+          <>
+            <div className="cart-grid">
+              {cartItems.map((item) => (
+                <div key={item.product._id} className="cart-card">
+                  {/* IMAGE + VIEW ICON */}
+                  <div className="cart-img-wrapper">
+                    <img
+                      src={item.product.image || "/images/placeholder.png"}
+                      alt={item.product.name}
+                    />
+                    <div
+                      className="cart-view-icon"
+                      onClick={() => setSelectedProduct(item.product)}
+                    >
+                      <FaEye />
+                    </div>
+                  </div>
 
-                <div className="quantity-wrapper">
+                  {/* NAME & DESCRIPTION */}
+                  <h3>{item.product.name}</h3>
+                  {item.product.description && (
+                    <p className="cart-description">{item.product.description}</p>
+                  )}
+
+                  {/* PRICE */}
+                  <p>₹ {item.product.price}</p>
+
+                  {/* QUANTITY */}
+                  <div className="quantity-wrapper">
+                    <button
+                      onClick={() => decrement(item.productId, item.quantity)}
+                      disabled={workingId === item.productId}
+                    >
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      disabled={workingId === item.productId}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* REMOVE */}
                   <button
-                    onClick={() => decrement(item.productId, item.quantity)}
+                    className="remove-btn"
+                    onClick={() => removeItem(item.productId)}
                     disabled={workingId === item.productId}
                   >
-                    -
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                    disabled={workingId === item.productId}
-                  >
-                    +
+                    {workingId === item.productId ? "Processing..." : "Remove"}
                   </button>
                 </div>
+              ))}
+            </div>
 
-                <button
-                  className="remove-btn"
-                  onClick={() => removeItem(item.productId)}
-                  disabled={workingId === item.productId}
-                >
-                  {workingId === item.productId ? "Processing..." : "Remove"}
-                </button>
-              </div>
-            ))}
-          </div>
+            {/* TOTAL & CHECKOUT */}
+            <div className="cart-total">
+              <h3>Total: ₹ {total}</h3>
+              <button
+                className="checkout-btn"
+                onClick={() => alert("Proceed to checkout — implement payment flow")}
+              >
+                Proceed to Checkout
+              </button>
+            </div>
+          </>
+        )}
+      </div>
 
-          <div className="cart-total">
-            <h3>Total: ₹ {total}</h3>
-            <button
-              className="checkout-btn"
-              onClick={() => alert("Proceed to checkout — implement payment flow")}
-            >
-              Proceed to Checkout
-            </button>
-          </div>
-        </>
+      {/* PRODUCT MODAL */}
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
       )}
-    </div>
+    </>
   );
 }
