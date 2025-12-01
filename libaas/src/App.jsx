@@ -78,6 +78,7 @@ function App() {
       <ScrollToTop />
       <Layout>
         <RefreshHandler setIsAuthenticated={setIsAuthenticated} />
+
         <Routes>
           {/* Main Pages */}
           <Route path="/" element={<PrivateRoute element={<Home />} />} />
@@ -91,7 +92,7 @@ function App() {
           {/* ⭐ My Orders */}
           <Route path="/my-orders" element={<MyOrders />} />
 
-          {/* Category Pages */}
+          {/* ⭐ Category Pages */}
           <Route path="/lahori-kudiyan" element={<LahoriKudiyan />} />
           <Route path="/bollywood-begums" element={<BollywoodBegums />} />
           <Route path="/ambarsari-apsaras" element={<AmbarsariApsaras />} />
@@ -100,7 +101,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/size-chart" element={<SizeChart />} />
 
-          {/* 404 */}
+          {/* 404 Page */}
           <Route
             path="*"
             element={
