@@ -1,15 +1,13 @@
-// src/components/ProductModal.jsx
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import "./ProductModal.css";
 import axios from "axios";
 
-export default function ProductModal({ product, onClose }) {
+export default function ProductModal({ product, onClose, onBuyNow }) {
   const [wishlisted, setWishlisted] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [working, setWorking] = useState(false);
 
-  // Memoize availableSizes so it doesn't change every render
   const availableSizes = useMemo(
     () => product?.sizes ?? ["XS", "S", "M", "L"],
     [product?.sizes]
@@ -22,10 +20,9 @@ export default function ProductModal({ product, onClose }) {
   const price = product?.price ?? 0;
 
   const token = localStorage.getItem("token");
-  const authHeader = useMemo(
-    () => (token ? { Authorization: token } : {}),
-    [token]
-  );
+  const authHeader = useMemo(() => (token ? { Authorization: token } : {}), [
+    token,
+  ]);
 
   const wishlistBase = "http://localhost:8080/wishlist";
   const cartUpdateUrl = "http://localhost:8080/cart/update";
@@ -56,14 +53,12 @@ export default function ProductModal({ product, onClose }) {
     return () => {
       alive = false;
     };
-  }, [productId, token, authHeader, wishlistBase]); // ✅ FIXED (added authHeader)
+  }, [productId, token, authHeader, wishlistBase]);
 
-  // Keep selectedSize in sync with availableSizes
   useEffect(() => {
     setSelectedSize(availableSizes[0]);
   }, [availableSizes]);
 
-  // Close on Escape key
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") onClose?.();
@@ -128,6 +123,24 @@ export default function ProductModal({ product, onClose }) {
     } finally {
       setWorking(false);
     }
+  };
+
+  // ✅ Handle Buy Now: Opens Address Modal
+  const handleBuyNow = () => {
+    if (!token) return alert("Please login first!");
+    if (!productId) return;
+
+    // Pass product info to Cart.jsx
+    onBuyNow?.({
+      _id: productId,
+      name: title,
+      image,
+      price,
+      quantity,
+      size: selectedSize,
+    });
+
+    onClose?.(); // close modal after click
   };
 
   const onOverlayClick = (e) => {
@@ -221,16 +234,18 @@ export default function ProductModal({ product, onClose }) {
             </div>
 
             <div className="actions">
-              <button className="add-to-cart" onClick={addToCart} disabled={working}>
+              <button
+                className="add-to-cart"
+                onClick={addToCart}
+                disabled={working}
+              >
                 {working
                   ? "Adding..."
                   : `Add to Cart${selectedSize ? ` — ${selectedSize}` : ""}`}
               </button>
               <button
                 className="buy-now"
-                onClick={() =>
-                  alert("Buy now clicked — implement checkout flow")
-                }
+                onClick={handleBuyNow}
                 disabled={working}
               >
                 Buy Now

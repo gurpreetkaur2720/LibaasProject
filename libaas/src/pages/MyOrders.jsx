@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import "../pages/MyOrders.css";
 import axios from "../axiosConfig";
+import { FaEye } from "react-icons/fa";
+import ProductModal from "../components/ProductModal";
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // FETCH ORDERS FROM BACKEND
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("/api/orders/my-orders", {
-          withCredentials: true,
+        const res = await axios.get("http://localhost:8080/orders/my-orders", {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
         });
-        setOrders(res.data.orders);
+        setOrders(res.data.orders || []);
       } catch (err) {
         console.log("Error fetching orders", err);
       }
@@ -30,45 +34,58 @@ export default function MyOrders() {
           <p className="no-orders">You have not placed any orders yet.</p>
         ) : (
           orders.map((order) => (
-            <div key={order._id} className="order-card">
-              
-              {/* TOP SECTION */}
+            <div key={order._id} className="order-wrapper">
+
+              {/* ORDER HEADER */}
               <div className="order-header">
                 <p><strong>Order ID:</strong> {order._id}</p>
                 <p className="order-status">{order.status}</p>
               </div>
 
-              {/* PRODUCT IMAGES */}
+              {/* ORDER ITEMS */}
               <div className="order-items">
-                {order.items.map((item) => (
-                  <img
-                    key={item.product._id}
-                    src={item.product.image}
-                    alt={item.product.name}
-                    className="order-product-img"
-                  />
+                {order.items.map((item, idx) => (
+                  <div key={idx} className="order-item-card">
+                    <div className="order-img-wrapper">
+                      <img
+                        src={item.image || "/images/placeholder.png"}
+                        alt={item.name}
+                        className="order-product-img"
+                      />
+                      <div
+                        className="order-view-icon"
+                        onClick={() => setSelectedProduct(item)}
+                      >
+                        <FaEye />
+                      </div>
+                    </div>
+
+                    <div className="order-item-info">
+                      <p><strong>{item.name}</strong></p>
+                      {item.description && <p>{item.description}</p>}
+                      <p>Price: ₹ {item.price}</p>
+                      <p>Quantity: {item.quantity}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
 
-              {/* INFO SECTION */}
-              <div className="order-info">
-                <p><strong>Total Amount:</strong> ₹{order.totalAmount}</p>
-                <p>
-                  <strong>Date:</strong>{" "}
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </p>
+              {/* TOTAL + DATE */}
+              <div className="order-summary">
+                <p><strong>Total Amount:</strong> ₹ {order.totalAmount}</p>
+                <p><strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}</p>
               </div>
-
-              {/* BUTTONS */}
-              <div className="order-buttons">
-                <button className="btn-reorder">Order Again</button>
-                <button className="btn-details">View Details</button>
-              </div>
-
             </div>
           ))
         )}
       </div>
+
+      {selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
   );
 }

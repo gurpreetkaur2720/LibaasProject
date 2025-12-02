@@ -1,18 +1,23 @@
-// src/pages/Cart.jsx
-import { useEffect, useMemo, useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Cart.css";
+import { FaEye } from "react-icons/fa";
+import ProductModal from "../components/ProductModal";
 import { allProducts } from "../data/productData";
-import { FaEye } from "react-icons/fa"; // Eye icon
-import ProductModal from "../components/ProductModal"; 
-
+import "./Cart.css";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [workingId, setWorkingId] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null); // For modal
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [address, setAddress] = useState("");
+  const [buyNowItem, setBuyNowItem] = useState(null);
+
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
   const cartGetUrl = "http://localhost:8080/cart";
   const cartUpdateUrl = "http://localhost:8080/cart/update";
@@ -33,12 +38,10 @@ export default function Cart() {
         setLoading(false);
         return;
       }
-
       try {
         const res = await axios.get(cartGetUrl, {
           headers: { Authorization: token },
         });
-
         const rawItems = res?.data?.cart?.items ?? [];
         const mapped = mapItemsToProducts(rawItems);
         setCartItems(mapped);
@@ -49,16 +52,14 @@ export default function Cart() {
         setLoading(false);
       }
     };
-
     fetchCart();
   }, [token]);
 
   const total = useMemo(() => {
-    return cartItems.reduce((sum, it) => {
-      const price = Number(it.product?.price ?? 0);
-      const qty = Number(it.quantity ?? 0);
-      return sum + price * qty;
-    }, 0);
+    return cartItems.reduce(
+      (sum, it) => sum + Number(it.product?.price) * Number(it.quantity),
+      0
+    );
   }, [cartItems]);
 
   const updateQuantity = async (productId, newQty) => {
@@ -67,8 +68,11 @@ export default function Cart() {
 
     setWorkingId(productId);
     const prev = [...cartItems];
-    setCartItems((prevList) =>
-      prevList.map((it) => (it.productId === productId ? { ...it, quantity: newQty } : it))
+
+    setCartItems((old) =>
+      old.map((it) =>
+        it.productId === productId ? { ...it, quantity: newQty } : it
+      )
     );
 
     try {
@@ -79,7 +83,7 @@ export default function Cart() {
       );
     } catch (err) {
       console.error("Failed to update quantity:", err);
-      alert(err?.response?.data?.message || "Could not update quantity. Reverting.");
+      alert("Could not update. Reverting.");
       setCartItems(prev);
     } finally {
       setWorkingId(null);
@@ -92,7 +96,8 @@ export default function Cart() {
 
     setWorkingId(productId);
     const prev = [...cartItems];
-    setCartItems((prevList) => prevList.filter((it) => it.productId !== productId));
+
+    setCartItems((old) => old.filter((it) => it.productId !== productId));
 
     try {
       await axios.put(
@@ -102,7 +107,7 @@ export default function Cart() {
       );
     } catch (err) {
       console.error("Failed to remove item:", err);
-      alert(err?.response?.data?.message || "Could not remove item. Reverting.");
+      alert("Could not remove. Reverting.");
       setCartItems(prev);
     } finally {
       setWorkingId(null);
@@ -115,6 +120,67 @@ export default function Cart() {
       removeItem(productId);
     } else {
       updateQuantity(productId, next);
+    }
+  };
+
+  // ✅ Handle Checkout / Buy Now
+  const handleCheckout = (singleItem) => {
+    if (!token) return alert("Please login first!");
+
+    if (singleItem && singleItem._id) {
+      setBuyNowItem(singleItem); // Buy Now from ProductModal
+    } else if (cartItems.length === 0) {
+      return alert("Your cart is empty!");
+    } else {
+      setBuyNowItem(null); // Cart checkout
+    }
+
+    setShowAddressModal(true); // Open Address Modal
+  };
+
+  // Place Order
+  const placeOrder = async () => {
+    if (!address.trim()) return alert("Address is required!");
+
+    try {
+      let orderItems = [];
+
+      if (buyNowItem) {
+        orderItems.push({
+          productId: buyNowItem._id,
+          name: buyNowItem.name,
+          image: buyNowItem.image,
+          price: buyNowItem.price,
+          quantity: buyNowItem.quantity,
+          size: buyNowItem.size,
+        });
+      } else {
+        orderItems = cartItems.map((it) => ({
+          productId: it.product._id,
+          name: it.product.name,
+          image: it.product.image,
+          price: it.product.price,
+          quantity: it.quantity,
+        }));
+      }
+
+      const res = await axios.post(
+        "http://localhost:8080/orders/create",
+        { items: orderItems, address },
+        { headers: { Authorization: token } }
+      );
+
+      if (res.data.success) {
+        alert("Order Placed Successfully!");
+        if (!buyNowItem) setCartItems([]);
+        setShowAddressModal(false);
+        setAddress("");
+        setBuyNowItem(null);
+        navigate("/my-orders");
+      }
+    } catch (err) {
+      console.error("Checkout failed:", err);
+      alert(err?.response?.data?.message || "Order failed");
     }
   };
 
@@ -139,11 +205,11 @@ export default function Cart() {
             <div className="cart-grid">
               {cartItems.map((item) => (
                 <div key={item.product._id} className="cart-card">
-                  {/* IMAGE + VIEW ICON */}
                   <div className="cart-img-wrapper">
                     <img
                       src={item.product.image || "/images/placeholder.png"}
                       alt={item.product.name}
+                      className="cart-product-img"
                     />
                     <div
                       className="cart-view-icon"
@@ -153,16 +219,11 @@ export default function Cart() {
                     </div>
                   </div>
 
-                  {/* NAME & DESCRIPTION */}
                   <h3>{item.product.name}</h3>
-                  {item.product.description && (
-                    <p className="cart-description">{item.product.description}</p>
-                  )}
+                  <p className="cart-description">{item.product.description}</p>
 
-                  {/* PRICE */}
                   <p>₹ {item.product.price}</p>
 
-                  {/* QUANTITY */}
                   <div className="quantity-wrapper">
                     <button
                       onClick={() => decrement(item.productId, item.quantity)}
@@ -172,14 +233,15 @@ export default function Cart() {
                     </button>
                     <span>{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      onClick={() =>
+                        updateQuantity(item.productId, item.quantity + 1)
+                      }
                       disabled={workingId === item.productId}
                     >
                       +
                     </button>
                   </div>
 
-                  {/* REMOVE */}
                   <button
                     className="remove-btn"
                     onClick={() => removeItem(item.productId)}
@@ -191,26 +253,50 @@ export default function Cart() {
               ))}
             </div>
 
-            {/* TOTAL & CHECKOUT */}
             <div className="cart-total">
               <h3>Total: ₹ {total}</h3>
-              <button
-                className="checkout-btn"
-                onClick={() => alert("Proceed to checkout — implement payment flow")}
-              >
-                Proceed to Checkout
+              <button className="checkout-btn" onClick={() => handleCheckout()}>
+                Proceed to Checkout (COD)
               </button>
             </div>
           </>
         )}
       </div>
 
-      {/* PRODUCT MODAL */}
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
+          onBuyNow={handleCheckout} // ✅ Buy Now integration
         />
+      )}
+
+      {showAddressModal && (
+        <div className="address-overlay">
+          <div className="address-container">
+            <h3 className="address-title">Enter Delivery Address</h3>
+
+            <textarea
+              className="address-input"
+              placeholder="Enter your full delivery address..."
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            ></textarea>
+
+            <div className="address-btn-box">
+              <button className="address-confirm" onClick={placeOrder}>
+                Confirm & Place Order
+              </button>
+
+              <button
+                className="address-cancel"
+                onClick={() => setShowAddressModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

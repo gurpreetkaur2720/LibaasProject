@@ -2,26 +2,17 @@ const CartModel = require("../models/CartModel");
 const userModel = require("../models/UserModel");
 const { products } = require("../data/productData");
 
+// GET CART
 const getCartlist = async (req, res) => {
     try {
         const userId = req.user && req.user._id;
-        if (!userId) {
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
+        if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
         const user = await userModel.findById(userId).select("_id");
-        if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
-        }
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
         const cart = await CartModel.findOne({ user: userId }).lean();
-
-        if (!cart) {
-            return res.json({
-                success: true,
-                cart: { user: userId, items: [], totalQuantity: 0, totalPrice: 0 },
-            });
-        }
+        if (!cart) return res.json({ success: true, cart: { user: userId, items: [], totalQuantity: 0, totalPrice: 0 } });
 
         return res.json({ success: true, cart });
     } catch (error) {
@@ -30,22 +21,13 @@ const getCartlist = async (req, res) => {
     }
 };
 
-
-// build a price map once
+// Price map
 const priceMap = new Map(products.map(p => [p._id, Number(p.price) || 0]));
-
-/**
- * Helper to compute totalPrice from cart.items
- * items: [{ productId, quantity }, ...]
- */
 function computeTotalPrice(items) {
-    return items.reduce((sum, it) => {
-        const price = priceMap.get(it.productId) ?? 0;
-        const qty = Number(it.quantity) || 0;
-        return sum + price * qty;
-    }, 0);
+    return items.reduce((sum, it) => sum + (priceMap.get(it.productId) ?? 0) * (Number(it.quantity) || 0), 0);
 }
 
+// UPDATE CART
 const updateCart = async (req, res) => {
     try {
         const userId = req.user && req.user._id;
@@ -59,14 +41,14 @@ const updateCart = async (req, res) => {
         if (!cart) cart = new CartModel({ user: userId, items: [], totalQuantity: 0, totalPrice: 0 });
 
         if (Array.isArray(items)) {
-            // replace cart
+            // Replace entire cart
             const cleanItems = items
                 .filter(it => it && typeof it.productId === "string" && typeof it.quantity === "number" && it.quantity > 0)
                 .map(it => ({ productId: it.productId, quantity: Math.floor(it.quantity) }));
 
             cart.items = cleanItems;
-            cart.totalQuantity = cart.items.reduce((s, it) => s + it.quantity, 0);
-            cart.totalPrice = computeTotalPrice(cart.items);
+            cart.totalQuantity = cleanItems.reduce((s, it) => s + it.quantity, 0);
+            cart.totalPrice = computeTotalPrice(cleanItems);
 
             await cart.save();
             return res.json({ success: true, cart });
@@ -76,7 +58,7 @@ const updateCart = async (req, res) => {
             return res.status(400).json({ success: false, message: "productId is required (or provide items array)" });
         }
 
-        const act = (action || "add").toString().toLowerCase();
+        const act = (action || "add").toLowerCase();
         const idx = cart.items.findIndex(it => it.productId === productId);
 
         if (act === "add") {
@@ -84,9 +66,6 @@ const updateCart = async (req, res) => {
             if (idx > -1) cart.items[idx].quantity += qtyToAdd;
             else cart.items.push({ productId, quantity: qtyToAdd });
         } else if (act === "set") {
-            if (typeof quantity !== "number") {
-                return res.status(400).json({ success: false, message: "quantity (number) is required for action 'set'" });
-            }
             const qty = Math.floor(quantity);
             if (qty <= 0) cart.items = cart.items.filter(it => it.productId !== productId);
             else if (idx > -1) cart.items[idx].quantity = qty;
@@ -97,7 +76,7 @@ const updateCart = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid action" });
         }
 
-        cart.totalQuantity = cart.items.reduce((s, it) => s + (it.quantity || 0), 0);
+        cart.totalQuantity = cart.items.reduce((s, it) => s + it.quantity, 0);
         cart.totalPrice = computeTotalPrice(cart.items);
 
         await cart.save();
@@ -108,10 +87,25 @@ const updateCart = async (req, res) => {
     }
 };
 
-module.exports = { updateCart };
+// CLEAR CART
+const clearCart = async (req, res) => {
+    try {
+        const userId = req.user?._id;
+        if (!userId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
+        let cart = await CartModel.findOne({ user: userId });
+        if (!cart) cart = new CartModel({ user: userId, items: [] });
+        else cart.items = [];
 
-module.exports = {
-    getCartlist,
-    updateCart
+        cart.totalQuantity = 0;
+        cart.totalPrice = 0;
+        await cart.save();
+
+        return res.json({ success: true, message: "Cart cleared", cart });
+    } catch (err) {
+        console.error("Clear cart error:", err);
+        return res.status(500).json({ success: false, message: "Server error" });
+    }
 };
+
+module.exports = { getCartlist, updateCart, clearCart };

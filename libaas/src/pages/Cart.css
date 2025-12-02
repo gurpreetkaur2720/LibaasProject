@@ -40,7 +40,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: 0.3s ease;
   text-align: center;
-  max-width: 300px;   /* bigger card */
+  max-width: 300px;
   margin: auto;
   position: relative;
 }
@@ -58,7 +58,7 @@
 
 .cart-card img {
   width: 100%;
-  height: 260px;   /* taller image */
+  height: 260px;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
@@ -67,7 +67,7 @@
   transform: scale(1.05);
 }
 
-/* 👁 VIEW ICON */
+/* VIEW ICON */
 .cart-view-icon {
   position: absolute;
   bottom: 8px;
@@ -107,37 +107,26 @@
   color: #777;
   margin: 4px 0 8px;
   line-height: 1.3;
-  text-align: center;
-}
-
-/* PRICE */
-.cart-price {
-  font-size: 15px;
-  font-weight: 700;
-  color: #241fb9;
-  margin: 6px 0;
 }
 
 /* QUANTITY BUTTONS */
 .quantity-wrapper {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   margin: 6px 0;
 }
 
 .quantity-wrapper button {
-  width: 28px;   /* slightly bigger button */
+  width: 28px;
   height: 28px;
   border: none;
-  border-radius: 5px;
   background: #241fb9;
-  color: #fff;
+  color: white;
+  border-radius: 5px;
   font-size: 14px;
-  font-weight: bold;
   cursor: pointer;
-  transition: 0.25s;
 }
 
 .quantity-wrapper button:hover {
@@ -148,52 +137,146 @@
   min-width: 20px;
   text-align: center;
   font-weight: 600;
-  font-size: 13px;
 }
 
 /* REMOVE BUTTON */
 .remove-btn {
   width: 100%;
-  padding: 10px;  /* slightly bigger */
+  padding: 10px;
   margin-top: 6px;
   border: none;
   border-radius: 9px;
-  font-size: 14px;
-  cursor: pointer;
   background: #eee;
   color: #333;
-  transition: 0.25s;
+  cursor: pointer;
 }
 
 .remove-btn:hover {
-  background: #ffdfdf;
-  color: #d00000;
+  background: #ffdcdc;
+  color: #c70000;
 }
 
-/* TOTAL & CHECKOUT */
+/* TOTAL */
 .cart-total {
   margin-top: 25px;
-  text-align: center;
-}
-
-.cart-total h3 {
-  font-size: 18px;
-  color: #222;
-  margin-bottom: 10px;
 }
 
 .checkout-btn {
   padding: 11px 22px;
   font-size: 15px;
   font-weight: 600;
-  color: #fff;
+  color: white;
   background: #241fb9;
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: 0.25s;
 }
 
 .checkout-btn:hover {
   background: #100d73;
+}
+
+/* -------------------------------
+      ADDRESS MODAL — FINAL UPDATED
+-------------------------------- */
+/* -------------------------------
+      FIXED — ADDRESS MODAL
+-------------------------------- */
+
+/* Black overlay */
+.address-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* White center box */
+.address-container {
+  width: 430px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+  /* 🟢 FIX: Center the inner textarea */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Title centered */
+.address-title {
+  font-size: 21px;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  margin: 0;
+}
+
+/* Textarea (now perfectly centered!) */
+.address-input {
+  width: 95%;              /* 🟢 FIXED: No more right shift */
+  height: 140px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid #ccc;
+  resize: none;
+  font-size: 14px;
+  outline: none;
+}
+
+.address-input:focus {
+  border-color: #007bff;
+}
+
+/* Buttons Row */
+.address-btn-box {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Confirm button (blue) */
+.address-confirm {
+  background: #007bff;
+  color: white;
+  padding: 12px 0;
+  width: 50%;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.address-confirm:hover {
+  background: #005fcc;
+}
+
+/* Cancel button (new color: smooth grey-red) */
+.address-cancel {
+  background: #ff6b5b;      /* 🟢 NEW COLOR */
+  color: white;
+  padding: 12px 0;
+  width: 50%;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.address-cancel:hover {
+  background: #e05245;      /* deeper shade */
 }

@@ -3,7 +3,7 @@ const router = express.Router();
 const OrderController = require('../controllers/OrderController');
 const auth = require('../middleware/Auth');
 
-// Create an order (supports COD + QR Payment)
+// Create an order (supports COD)
 router.post('/create', auth, OrderController.createOrder);
 
 // User's own orders

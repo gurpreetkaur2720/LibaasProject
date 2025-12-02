@@ -1,68 +1,68 @@
-const Order = require('../models/OrderModel');
+const Order = require("../models/OrderModel");
+const CartModel = require("../models/CartModel");
 
+// CREATE ORDER — separate order for each cart item with address
 exports.createOrder = async (req, res) => {
   try {
-    // User detect from auth middleware
-    const userId = req.user && req.user.id ? req.user.id : req.user?._id;
-    if (!userId) return res.status(401).json({ message: 'Not authenticated' });
+    const userId = req.user?._id;
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Not authenticated" });
 
-    const { items, totalAmount, shippingAddress, paymentMethod, transactionId } = req.body;
+    const { items, address } = req.body;
+    if (!items || !items.length)
+      return res.status(400).json({ success: false, message: "No items provided" });
 
-    if (!items || !items.length) {
-      return res.status(400).json({ message: 'No items provided' });
+    if (!address || !address.trim())
+      return res.status(400).json({ success: false, message: "Address is required" });
+
+    const createdOrders = [];
+
+    for (let item of items) {
+      const order = new Order({
+        userId,
+        items: [item], // one item per order
+        totalAmount: item.price * item.quantity,
+        paymentMethod: "COD",
+        paymentStatus: "pending",
+        status: "Processing",
+        address, // save delivery address
+      });
+
+      await order.save();
+      createdOrders.push(order);
     }
 
-    // ------------------------------
-    // PAYMENT STATUS LOGIC UPDATED
-    // ------------------------------
-    let paymentStatus = "pending";
-
-    if (paymentMethod === "CARD") {
-      paymentStatus = "paid";
+    // Clear cart after placing order
+    const cart = await CartModel.findOne({ user: userId });
+    if (cart) {
+      cart.items = [];
+      cart.totalQuantity = 0;
+      cart.totalPrice = 0;
+      await cart.save();
     }
-
-    if (paymentMethod === "QR") {
-      paymentStatus = "paid";  // QR scan = payment received
-    }
-
-    // Create order
-    const order = new Order({
-      userId,
-      items,
-      totalAmount,
-      shippingAddress,
-      paymentMethod,   // COD | QR | CARD
-      paymentStatus,   // pending | paid
-      transactionId: transactionId || null   // Store QR data here
-    });
-
-    await order.save();
 
     return res.status(201).json({
       success: true,
-      message:
-        paymentMethod === "COD"
-          ? "COD Order Placed Successfully!"
-          : "Payment Successful & Order Created!",
-      order
+      message: "Orders placed successfully!",
+      orders: createdOrders,
     });
-
   } catch (err) {
-    console.error('createOrder error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("createOrder error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
+// GET MY ORDERS
 exports.getMyOrders = async (req, res) => {
   try {
-    const userId = req.user && (req.user.id || req.user._id);
-    if (!userId) return res.status(401).json({ message: 'Not authenticated' });
+    const userId = req.user?._id;
+    if (!userId)
+      return res.status(401).json({ success: false, message: "Not authenticated" });
 
     const orders = await Order.find({ userId }).sort({ createdAt: -1 });
-    return res.json({ orders });
-
+    return res.status(200).json({ success: true, orders });
   } catch (err) {
-    console.error('getMyOrders error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("getMyOrders error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };
