@@ -27,7 +27,6 @@ export default function ProductModal({ product, onClose, onBuyNow }) {
   const wishlistBase = "http://localhost:8080/wishlist";
   const cartUpdateUrl = "http://localhost:8080/cart/update";
 
-  // Fetch wishlist state
   useEffect(() => {
     let alive = true;
     if (!token || !productId) {
@@ -125,12 +124,12 @@ export default function ProductModal({ product, onClose, onBuyNow }) {
     }
   };
 
-  // ✅ Handle Buy Now: Opens Address Modal
+  // ✅ Fixed Buy Now
   const handleBuyNow = () => {
     if (!token) return alert("Please login first!");
     if (!productId) return;
 
-    // Pass product info to Cart.jsx
+    // Pass product info to Cart
     onBuyNow?.({
       _id: productId,
       name: title,
@@ -140,7 +139,10 @@ export default function ProductModal({ product, onClose, onBuyNow }) {
       size: selectedSize,
     });
 
-    onClose?.(); // close modal after click
+    // Close modal after a tiny delay to ensure parent state updates
+    setTimeout(() => {
+      onClose?.();
+    }, 50);
   };
 
   const onOverlayClick = (e) => {

@@ -30,6 +30,7 @@ export default function Cart() {
       })
       .filter((it) => it.product !== null);
 
+  // Fetch cart items
   useEffect(() => {
     const fetchCart = async () => {
       setLoading(true);
@@ -62,6 +63,7 @@ export default function Cart() {
     );
   }, [cartItems]);
 
+  // Update quantity
   const updateQuantity = async (productId, newQty) => {
     if (!token) return alert("Please login first!");
     if (newQty < 1) return;
@@ -90,6 +92,7 @@ export default function Cart() {
     }
   };
 
+  // Remove item
   const removeItem = async (productId) => {
     if (!token) return alert("Please login first!");
     if (!window.confirm("Remove this item from your cart?")) return;
@@ -161,6 +164,7 @@ export default function Cart() {
           image: it.product.image,
           price: it.product.price,
           quantity: it.quantity,
+          size: it.size || null,
         }));
       }
 
@@ -267,7 +271,7 @@ export default function Cart() {
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onBuyNow={handleCheckout} // ✅ Buy Now integration
+          onBuyNow={handleCheckout} // ✅ Buy Now triggers Address Modal
         />
       )}
 
@@ -278,7 +282,7 @@ export default function Cart() {
 
             <textarea
               className="address-input"
-              placeholder="Enter your full delivery address..."
+              placeholder="Enter your full delivery address (e.g., Name, House/Flat No., Street, District, State, Pincode, Phone Number)"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             ></textarea>
