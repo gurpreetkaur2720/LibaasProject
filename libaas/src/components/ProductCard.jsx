@@ -118,7 +118,7 @@ export default function ProductCard({ product }) {
       console.error("Failed to move to cart:", err);
       alert(
         err?.response?.data?.message ||
-          "Could not move item to cart. Try again."
+        "Could not move item to cart. Try again."
       );
     } finally {
       setWorkingId(null);

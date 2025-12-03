@@ -2,12 +2,15 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import "./ProductModal.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-export default function ProductModal({ product, onClose, onBuyNow }) {
+export default function ProductModal({ product, onClose }) {
   const [wishlisted, setWishlisted] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [working, setWorking] = useState(false);
-
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [address, setAddress] = useState("");
+  const navigate = useNavigate();
   const availableSizes = useMemo(
     () => product?.sizes ?? ["XS", "S", "M", "L"],
     [product?.sizes]
@@ -127,28 +130,49 @@ export default function ProductModal({ product, onClose, onBuyNow }) {
   // ✅ Fixed Buy Now
   const handleBuyNow = () => {
     if (!token) return alert("Please login first!");
-    if (!productId) return;
+    setShowAddressModal(true);
 
-    // Pass product info to Cart
-    onBuyNow?.({
-      _id: productId,
-      name: title,
-      image,
-      price,
-      quantity,
-      size: selectedSize,
-    });
 
-    // Close modal after a tiny delay to ensure parent state updates
-    setTimeout(() => {
-      onClose?.();
-    }, 50);
   };
 
   const onOverlayClick = (e) => {
     if (e.target === e.currentTarget) onClose?.();
   };
 
+
+  const placeOrder = async () => {
+    try {
+
+      const itemDetails = {
+        productId,
+        name: title,
+        image,
+        price,
+        quantity: 1,
+        size: selectedSize,
+      };
+
+      const res = await axios.post(
+        "http://localhost:8080/orders/create",
+        { items: [itemDetails], address },
+        { headers: { Authorization: token } }
+      );
+
+
+
+      if (res.data.success) {
+        alert("Order Placed Successfully!");
+        setShowAddressModal(false);
+        setAddress("");
+        navigate("/my-orders");
+      }
+
+
+    } catch (err) {
+      console.error("Checkout failed:", err);
+      alert(err?.response?.data?.message || "Order failed");
+    }
+  }
   if (!product) return null;
 
   return (
@@ -198,9 +222,8 @@ export default function ProductModal({ product, onClose, onBuyNow }) {
                 <button
                   key={size}
                   type="button"
-                  className={`size-btn ${
-                    selectedSize === size ? "active" : ""
-                  }`}
+                  className={`size-btn ${selectedSize === size ? "active" : ""
+                    }`}
                   onClick={() => setSelectedSize(size)}
                   aria-pressed={selectedSize === size}
                 >
@@ -256,6 +279,37 @@ export default function ProductModal({ product, onClose, onBuyNow }) {
           </div>
         </div>
       </div>
+
+
+      {showAddressModal && (
+        <div className="address-overlay">
+          <div className="address-container">
+            <h3 className="address-title">  Enter Delivery Address 🏠📞📍  </h3>
+
+            <textarea
+              className="address-input"
+              placeholder="Enter your full delivery address (e.g., Name, House/Flat No., Street, District, State, Pincode, Phone Number)"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            ></textarea>
+
+            <div className="address-btn-box">
+              <button className="address-confirm" onClick={placeOrder}>
+                Confirm & Place Order
+              </button>
+
+              <button
+                className="address-cancel"
+                onClick={() => setShowAddressModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }
