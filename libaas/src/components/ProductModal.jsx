@@ -154,7 +154,10 @@ export default function ProductModal({ product, onClose }) {
 
       const res = await axios.post(
         "http://localhost:8080/orders/create",
-        { items: [itemDetails], address },
+        {
+        items: [itemDetails],
+        deliveryAddress: address   // ✅ FIXED HERE
+      },
         { headers: { Authorization: token } }
       );
 

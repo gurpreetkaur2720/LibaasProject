@@ -1,18 +1,19 @@
 const Order = require("../models/OrderModel");
 const CartModel = require("../models/CartModel");
 
-// CREATE ORDER — separate order for each cart item with address
+// CREATE ORDER — one order per item
 exports.createOrder = async (req, res) => {
   try {
     const userId = req.user?._id;
     if (!userId)
       return res.status(401).json({ success: false, message: "Not authenticated" });
 
-    const { items, address } = req.body;
+    const { items, deliveryAddress } = req.body; // ✅ frontend key matches
+
     if (!items || !items.length)
       return res.status(400).json({ success: false, message: "No items provided" });
 
-    if (!address || !address.trim())
+    if (!deliveryAddress || !deliveryAddress.trim())
       return res.status(400).json({ success: false, message: "Address is required" });
 
     const createdOrders = [];
@@ -20,19 +21,19 @@ exports.createOrder = async (req, res) => {
     for (let item of items) {
       const order = new Order({
         userId,
-        items: [item], // one item per order
+        items: [item],
         totalAmount: item.price * item.quantity,
         paymentMethod: "COD",
         paymentStatus: "pending",
         status: "Processing",
-        address, // save delivery address
+        deliveryAddress, // ✅ save delivery address
       });
 
       await order.save();
       createdOrders.push(order);
     }
 
-    // Clear cart after placing order
+    // Clear cart
     const cart = await CartModel.findOne({ user: userId });
     if (cart) {
       cart.items = [];

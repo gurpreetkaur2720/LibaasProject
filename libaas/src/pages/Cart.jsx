@@ -126,19 +126,19 @@ export default function Cart() {
     }
   };
 
-  // ✅ Handle Checkout / Buy Now
+  // Handle Checkout / Buy Now
   const handleCheckout = (singleItem) => {
     if (!token) return alert("Please login first!");
 
     if (singleItem && singleItem._id) {
-      setBuyNowItem(singleItem); // Buy Now from ProductModal
+      setBuyNowItem(singleItem);
     } else if (cartItems.length === 0) {
       return alert("Your cart is empty!");
     } else {
-      setBuyNowItem(null); // Cart checkout
+      setBuyNowItem(null);
     }
 
-    setShowAddressModal(true); // Open Address Modal
+    setShowAddressModal(true);
   };
 
   // Place Order
@@ -170,7 +170,7 @@ export default function Cart() {
 
       const res = await axios.post(
         "http://localhost:8080/orders/create",
-        { items: orderItems, address },
+        { items: orderItems, deliveryAddress: address },
         { headers: { Authorization: token } }
       );
 
@@ -271,18 +271,18 @@ export default function Cart() {
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onBuyNow={handleCheckout} // ✅ Buy Now triggers Address Modal
+          onBuyNow={handleCheckout}
         />
       )}
 
       {showAddressModal && (
         <div className="address-overlay">
           <div className="address-container">
-            <h3 className="address-title">  Enter Delivery Address 🏠📞📍  </h3>
+            <h3 className="address-title">Enter Delivery Address 🏠📞📍</h3>
 
             <textarea
               className="address-input"
-              placeholder="Enter your full delivery address (e.g., Name, House/Flat No., Street, District, State, Pincode, Phone Number)"
+              placeholder="Enter full delivery address in one line (e.g., Name, House/Flat No., Street, Area, City, State, PIN, Phone Number)"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             ></textarea>
